@@ -47,6 +47,7 @@ svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stro
 .tabs button{font-size:18px;letter-spacing:-.02em;color:var(--mute);display:flex;align-items:center;gap:6px;min-height:44px}
 .tabs button[aria-selected=true]{color:var(--ink)}
 .tabs i{font-style:normal;font-size:11px;background:var(--soft);border-radius:99px;padding:2px 7px;color:var(--mute)}
+.tabs .newb{display:none;align-items:center;gap:6px;min-height:44px;padding:0 16px 0 12px;border-radius:14px;background:var(--ink);color:var(--bg);font-size:15px;font-weight:500;white-space:nowrap}
 .tabs .vb{margin-left:auto;flex:none;width:44px;height:44px;border-radius:50%;background:var(--soft);color:var(--ink);justify-content:center}
 .search{display:none;margin:0 0 14px}.search.on{display:block}
 .note{font-size:12.5px;color:var(--mute);margin:-4px 2px 12px}
@@ -96,6 +97,9 @@ input::placeholder{color:var(--mute)}
 /* detalhe */
 #detail{position:fixed;inset:0;z-index:10;background:var(--cb);color:var(--cink);overflow-y:auto;overscroll-behavior:contain}
 #detail[hidden]{display:none}
+#bd{display:none}
+@media(min-width:960px){#bd.on{display:block;position:fixed;inset:0;z-index:9;background:rgba(10,10,12,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}#detail{inset:5vh 0;margin:0 auto;width:min(820px,calc(100vw - 64px));border-radius:30px;box-shadow:0 40px 90px rgba(0,0,0,.35);transform-origin:0 0}#detail .dwrap{max-width:none;padding-inline:clamp(24px,3vw,44px);padding-bottom:110px}#detail .dbar{padding-top:18px}#detail .fab{bottom:calc(5vh + 22px)}.wrap{display:grid;grid-template-columns:auto auto minmax(0,1fr) minmax(220px,340px) auto;column-gap:24px;align-items:center;padding-top:28px;padding-bottom:60px}.wrap>*{grid-column:1/-1}.wrap>.brand{grid-column:1;grid-row:1;margin:0;padding-right:22px;border-right:1px solid var(--line);align-self:stretch}.wrap>.hello{grid-column:2;grid-row:1;font-size:40px}.wrap>.who{grid-column:3;grid-row:1;margin:6px 0 0;justify-content:flex-start;align-items:baseline;gap:20px}.wrap>.who small{text-align:left;white-space:nowrap}.wrap>.who b{white-space:nowrap}.tabs .newb svg{flex:none}.wrap>.search{grid-column:4;grid-row:1;display:block;margin:0}.wrap>.tabs{grid-column:5;grid-row:1;margin:0;gap:16px}.wrap>.tabs .vb{margin-left:4px}.tabs .newb{display:inline-flex}.wrap>.note{margin:14px 0 0}.wrap>#cards{margin-top:26px}.nav{display:none}}
+@media(min-width:960px) and (max-width:1199px){.wrap>.who{display:none}.wrap{column-gap:16px}}
 .dwrap{max-width:640px;margin:0 auto;padding:0 18px calc(120px + var(--sb))}
 .dbar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;padding:calc(10px + var(--st)) 0 10px;background:var(--cb)}
 .rb{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--cw)}
@@ -253,6 +257,7 @@ input::placeholder{color:var(--mute)}
     <button role="tab" aria-selected="true" data-tab="ativas">Listas <i id="cA">0</i></button>
     <button role="tab" aria-selected="false" data-tab="ok">Concluídas <i id="cF">0</i></button>
     <button class="vb" id="vBtn" aria-label="Ajustes e sincronização"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg></button>
+    <button class="newb" id="nNew2"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova lista</button>
   </div>
   <div class="search" id="search"><input id="q" type="search" placeholder="Buscar listas e itens" autocomplete="off"></div>
   <p class="note" id="note" hidden></p>
@@ -265,6 +270,7 @@ input::placeholder{color:var(--mute)}
   <button id="nFind"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg>Buscar</button>
 </nav>
 
+<div id="bd"></div>
 <section id="detail" hidden aria-label="Lista">
   <div class="dwrap">
     <div class="dbar">
@@ -420,10 +426,15 @@ $('#q').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();r
 $('#nList').addEventListener('click',()=>{query='';$('#q').value='';$('#search').classList.remove('on');$('#nFind').classList.remove('on');scrollTo({top:0,behavior:RM?'auto':'smooth'});render()});
 $('#nFind').addEventListener('click',()=>{const on=$('#search').classList.toggle('on');$('#nFind').classList.toggle('on',on);if(on){scrollTo({top:0});$('#q').focus()}else{query='';$('#q').value='';render()}});
 $('#nNew').addEventListener('click',()=>listSheet());
+$('#nNew2').addEventListener('click',()=>listSheet());
 
 /* detalhe */
 const clipOf=el=>{const r=el.getBoundingClientRect();return `inset(${r.top}px ${innerWidth-r.right}px ${innerHeight-r.bottom}px ${r.left}px round ${parseFloat(getComputedStyle(el).borderRadius)||26}px)`};
 const FULL='inset(0px 0px 0px 0px round 0px)',homeEl=$('.wrap');
+const DESK=matchMedia('(min-width:960px)');
+const fromCard=el=>{if(!DESK.matches)return{clipPath:clipOf(el)};const r=el.getBoundingClientRect(),d=det.getBoundingClientRect();return{transform:`translate(${r.left-d.left}px,${r.top-d.top}px) scale(${r.width/d.width},${r.height/d.height})`}};
+const toFull=()=>DESK.matches?{transform:'none'}:{clipPath:FULL};
+function bd(on){const b=$('#bd');if(on){b.getAnimations().forEach(x=>x.cancel());b.classList.add('on');if(!RM&&DESK.matches)b.animate([{opacity:0},{opacity:1}],{duration:400,easing:'ease'})}else if(b.classList.contains('on')){if(RM||!DESK.matches)return b.classList.remove('on');b.animate([{opacity:1},{opacity:0}],{duration:420,easing:'ease',fill:'forwards'}).onfinish=()=>{if(openId)return;b.classList.remove('on');b.getAnimations().forEach(x=>x.cancel())}}}
 function homeAnim(out){
   homeEl.style.transformOrigin=`50% ${scrollY+innerHeight/2-homeEl.offsetTop}px`;
   const a={transform:'none',opacity:1},b={transform:'scale(.95)',opacity:.5};
@@ -432,11 +443,11 @@ function homeAnim(out){
 function openDetail(id,el,add){
   const l=byId(id);if(!l)return;
   openId=id;det.style.setProperty('--c',okC(l.color));renderDetail();
-  det.hidden=false;det.scrollTop=0;document.body.classList.add('lock');setTheme();
+  det.hidden=false;det.scrollTop=0;document.body.classList.add('lock');setTheme();bd(true);
   const anim=el&&!RM;
   if(anim){
     det.getAnimations({subtree:true}).forEach(a=>a.cancel());
-    det.animate([{clipPath:clipOf(el)},{clipPath:FULL}],{duration:700,easing:EZ});
+    det.animate([fromCard(el),toFull()],{duration:700,easing:EZ});
     det.animate([{opacity:0},{opacity:1}],{duration:160,easing:'ease-out'});
     homeAnim(true);
     $('.dbar').animate([{opacity:0},{opacity:1}],{duration:460,delay:160,easing:'ease-out',fill:'backwards'});
@@ -447,7 +458,7 @@ function openDetail(id,el,add){
 }
 function closeDetail(){
   if(!openId)return;const id=openId;openId=null;closeSheet();
-  document.body.classList.remove('lock');setTheme();
+  document.body.classList.remove('lock');setTheme();bd(false);
   if(RM){det.hidden=true;return}
   const el=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`),done=()=>{if(!openId){det.hidden=true;det.getAnimations({subtree:true}).forEach(x=>x.cancel())}};
   det.querySelector('.dwrap').animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(16px)'}],{duration:260,easing:'ease-in',fill:'forwards'});
@@ -455,7 +466,7 @@ function closeDetail(){
   if(!el){det.animate([{opacity:1},{opacity:0}],{duration:340,easing:'ease',fill:'forwards'}).onfinish=done;return}
   const r=el.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)el.scrollIntoView({block:'center'});
   homeAnim(false);
-  det.animate([{clipPath:FULL},{clipPath:clipOf(el)}],{duration:600,easing:EZ,fill:'forwards'});
+  det.animate([toFull(),fromCard(el)],{duration:600,easing:EZ,fill:'forwards'});
   det.animate([{opacity:1},{opacity:0}],{duration:240,delay:380,easing:'ease',fill:'forwards'}).onfinish=done;
 }
 /* FLIP: itens deslizam até a nova posição quando a lista muda */
@@ -508,6 +519,7 @@ $('#items').addEventListener('keydown',e=>{
   const nb=document.querySelector(`.irow[data-i="${CSS.escape(r.dataset.i)}"] .grip`);if(nb)nb.focus();
 });
 $('#dBack').addEventListener('click',closeDetail);
+$('#bd').addEventListener('click',closeDetail);
 $('#dMore').addEventListener('click',()=>listSheet(openId));
 $('#dAdd').addEventListener('click',()=>itemSheet());
 
@@ -578,7 +590,7 @@ function confirmDel(l){
   openSheet(hd('Excluir lista?')+`<p class="msg">“${esc(l.name)}”${n?` e ${n} ${n===1?'item':'itens'}`:''} serão apagados. Não dá para desfazer.</p>
   <div class="sbtns"><button type="button" class="btn" data-close>Cancelar</button><button class="btn danger">Excluir</button></div>`,()=>{
     
-    closeSheet();openId===l.id&&(openId=null,document.body.classList.remove('lock'),setTheme(null),det.hidden=true);
+    closeSheet();openId===l.id&&(openId=null,document.body.classList.remove('lock'),setTheme(null),det.hidden=true,bd(false));
     render();toast('Lista excluída');
     dropList(l.id);
   });
