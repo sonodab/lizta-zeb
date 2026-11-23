@@ -212,7 +212,7 @@ input::placeholder{color:var(--mute)}
 .pin .pbar{flex:none}
 .pitems{max-height:50vh;overflow-y:auto;overscroll-behavior:contain;margin:12px -4px 0;padding:0 4px 2px;display:flex;flex-direction:column;gap:6px}
 .pitem{width:100%;text-align:left;cursor:pointer;padding-right:14px}
-.psec{font-size:12.5px;opacity:.6;margin:8px 4px 2px}.pempty{opacity:.7;margin:10px 4px}
+.psec{font-size:12.5px;opacity:.6;margin:8px 4px 2px;text-align:left;padding:6px 0}.pempty{opacity:.7;margin:10px 4px}
 .pin .cacts{display:grid!important;margin-top:12px}
 #cards.haspin .rest .cmid,#cards.haspin .rest .cacts{display:none}#cards.haspin .rest .card{padding:12px 14px 10px}#cards.haspin .rest .cttl{margin:10px 0 8px}#cards.haspin .rest .cttl h2{font-size:17px}#cards.haspin .rest .card .mono{width:32px;height:32px;font-size:15px}#cards.haspin .rest .cmeta{margin:8px 0 2px}
 .rhint{color:var(--mute)}
@@ -459,7 +459,7 @@ function pinPanel(l){
   <div class="ctop">${l.tag?`<span class="tag">${esc(l.tag)}</span>`:''}<span class="tag">Fixada</span><button type="button" class="pbtn" data-unpin aria-label="Desafixar lista">${PIN}</button></div>
   <button type="button" class="ptitle" data-popen><h2>${esc(l.name)}</h2><span>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}${s.priced?` · ${brl.format(s.total)}`:''}</span></button>
   <div class="pbar"><i style="width:${s.n?s.done/s.n*100:0}%"></i></div>
-  <div class="pitems">${it.length?pend.map(prow).join('')+(done.length?`<div class="psec">Marcados (${done.length})</div>`+done.map(prow).join(''):''):'<p class="pempty">Nenhum item ainda.</p>'}</div>
+  <div class="pitems">${it.length?pend.map(prow).join('')+(done.length?`<button type="button" class="psec" data-popen>${pend.length?'':'Tudo marcado! '}${done.length} ${done.length===1?'marcado':'marcados'} · ver na lista</button>`:''):'<p class="pempty">Nenhum item ainda.</p>'}</div>
   <div class="cacts pacts">${SR?`<button type="button" class="soft pmic${rec&&recList===l.id?' rec':''}" data-pmic aria-label="Adicionar itens por voz">${MIC}</button>`:''}<button type="button" class="soft" data-padd>Adicionar item</button><button type="button" class="solid" data-popen>Abrir</button></div></section>`;
 }
 function setTab(t){tab=t;scrollTo({top:0});render()}
