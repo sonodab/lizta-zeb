@@ -99,7 +99,7 @@ input::placeholder{color:var(--mute)}
 #detail{position:fixed;inset:0;z-index:10;background:var(--cb);color:var(--cink);overflow-y:auto;overscroll-behavior:contain}
 #detail[hidden]{display:none}
 #bd{display:none}
-@media(min-width:960px){#bd.on{display:block;position:fixed;inset:0;z-index:9;background:rgba(10,10,12,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}#detail{inset:5vh 0;margin:0 auto;width:min(820px,calc(100vw - 64px));border-radius:30px;box-shadow:0 40px 90px rgba(0,0,0,.35);transform-origin:0 0}#detail .dwrap{max-width:none;padding-inline:clamp(24px,3vw,44px);padding-bottom:110px}#detail .dbar{padding-top:18px}#detail .fab{bottom:calc(5vh + 22px)}.wrap{display:grid;grid-template-columns:auto auto minmax(0,1fr) minmax(220px,340px) auto;column-gap:24px;align-items:center;padding-top:28px;padding-bottom:130px}.wrap>*{grid-column:1/-1}.wrap>.brand{grid-column:1;grid-row:1;margin:0;padding-right:22px;border-right:1px solid var(--line);align-self:stretch}.wrap>.hello{grid-column:2;grid-row:1;font-size:40px}.wrap>.who{grid-column:3;grid-row:1;margin:6px 0 0;justify-content:flex-start;align-items:baseline;gap:20px}.wrap>.who small{text-align:left;white-space:nowrap}.wrap>.who b{white-space:nowrap}.tabs .newb svg{flex:none}.wrap>.search{grid-column:4;grid-row:1;display:block;margin:0}.wrap>.tabs{grid-column:5;grid-row:1;margin:0;gap:16px}.wrap>.tabs .vb{margin-left:4px}.wrap>.note{margin:14px 0 0}.wrap>#cards{margin-top:26px}}
+@media(min-width:960px){#bd.on{display:block;position:fixed;inset:0;z-index:9;background:rgba(10,10,12,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}#detail{inset:5vh 0;margin:0 auto;width:min(820px,calc(100vw - 64px));border-radius:30px;box-shadow:0 40px 90px rgba(0,0,0,.35);transform-origin:0 0}#detail .dwrap{max-width:none;padding-inline:clamp(24px,3vw,44px);padding-bottom:110px}#detail .dbar{padding-top:18px}#detail .fabs{bottom:calc(5vh + 22px)}.wrap{display:grid;grid-template-columns:auto auto minmax(0,1fr) minmax(220px,340px) auto;column-gap:24px;align-items:center;padding-top:28px;padding-bottom:130px}.wrap>*{grid-column:1/-1}.wrap>.brand{grid-column:1;grid-row:1;margin:0;padding-right:22px;border-right:1px solid var(--line);align-self:stretch}.wrap>.hello{grid-column:2;grid-row:1;font-size:40px}.wrap>.who{grid-column:3;grid-row:1;margin:6px 0 0;justify-content:flex-start;align-items:baseline;gap:20px}.wrap>.who small{text-align:left;white-space:nowrap}.wrap>.who b{white-space:nowrap}.tabs .newb svg{flex:none}.wrap>.search{grid-column:4;grid-row:1;display:block;margin:0}.wrap>.tabs{grid-column:5;grid-row:1;margin:0;gap:16px}.wrap>.tabs .vb{margin-left:4px}.wrap>.note{margin:14px 0 0}.wrap>#cards{margin-top:26px}}
 @media(min-width:960px) and (max-width:1199px){.wrap>.who{display:none}.wrap{column-gap:16px}}
 .dwrap{max-width:640px;margin:0 auto;padding:0 18px calc(120px + var(--sb))}
 .dbar{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;padding:calc(10px + var(--st)) 0 10px;background:var(--cb)}
@@ -189,6 +189,20 @@ input::placeholder{color:var(--mute)}
 .seg span{transition:background-color .3s ease,box-shadow .3s ease;display:block;text-align:center;font-size:14px;line-height:40px;border-radius:11px;white-space:nowrap}
 .seg input:checked+span{background:var(--sheet);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.12)}
 .seg input:focus-visible+span{outline:2px solid #3a7bff;outline-offset:1px}
+/* voz */
+.fabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + var(--sb));z-index:11;display:flex;gap:10px;align-items:center}
+.fabs .fab{position:static;transform:none}
+.micb{flex:none;width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:var(--con);color:var(--cont);box-shadow:0 12px 30px rgba(0,0,0,.22)}
+.micb[hidden]{display:none}
+.micb.rec,.pmic.rec{background:#e5484d;color:#fff;animation:mic 1.2s ease-in-out infinite}
+@keyframes mic{50%{box-shadow:0 0 0 10px rgba(229,72,77,.18),0 12px 30px rgba(0,0,0,.22)}}
+#vo{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + var(--sb));z-index:25;width:min(420px,calc(100% - 24px));display:flex;align-items:center;gap:12px;background:var(--dark);color:#fff;border-radius:20px;padding:12px 12px 12px 16px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+#vo[hidden]{display:none}
+#vo .vdot{flex:none;width:12px;height:12px;border-radius:50%;background:#e5484d;animation:vdot 1s ease-in-out infinite}
+@keyframes vdot{50%{opacity:.35;transform:scale(.8)}}
+#vo .vtx{flex:1}#vo b{font-size:13px;font-weight:600;opacity:.7}#vo p{margin:2px 0 0;font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+#vo button{flex:none;min-height:40px;padding:0 14px;border-radius:12px;background:#fff;color:#111;font-weight:600;font-size:14px}
+.pacts{grid-template-columns:auto minmax(0,1fr) minmax(0,1fr)!important}.pmic{width:48px;display:grid;place-items:center}
 /* lista fixada */
 .pin{--c:#a6e6b8;background:var(--cb);color:var(--cink);border-radius:28px;padding:16px 16px 14px;margin-bottom:14px;display:flex;flex-direction:column}
 .pin .pbtn{margin-left:auto;flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--con);color:var(--cont)}.pin .pbtn svg{width:18px;height:18px}
@@ -305,12 +319,13 @@ input::placeholder{color:var(--mute)}
     <div class="pbar dprog"><i id="dBar"></i></div>
     <div id="items"></div>
   </div>
-  <button class="fab" id="dAdd"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Adicionar item</button>
+  <div class="fabs" id="dFabs"><button class="micb" id="dMic" aria-label="Adicionar itens por voz" hidden><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><button class="fab" id="dAdd"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Adicionar item</button></div>
 </section>
 
 <div id="scrim"></div>
 <form class="sheet" id="sheet" novalidate autocomplete="off"></form>
 <div id="toast" role="status"></div>
+<div id="vo" hidden role="status" aria-live="polite"><span class="vdot" aria-hidden="true"></span><div class="vtx"><b>Ouvindo…</b><p id="voT">Fale os itens, ex.: leite, café e pão</p></div><button type="button" id="voStop">Concluir</button></div>
 
 <script>
 {
@@ -420,6 +435,8 @@ function card(l){
   <div class="cacts"><button class="soft" data-add>Adicionar item</button><button class="solid">Abrir</button></div></article>`;
 }
 const finished=l=>{const s=stats(l);return s.n>0&&s.done===s.n};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const MIC='<svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
 const PIN='<svg class="i" viewBox="0 0 24 24"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"/><path d="M12 15v6"/></svg>';
 function pinnedList(){let b=null;for(const l of lists)if((l.pin||0)>0&&(!b||l.pin>b.pin))b=l;return b}
 function setPin(id,on){const l=byId(id);if(!l)return;
@@ -433,7 +450,7 @@ function pinPanel(l){
   <button type="button" class="ptitle" data-popen><h2>${esc(l.name)}</h2><span>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}${s.priced?` · ${brl.format(s.total)}`:''}</span></button>
   <div class="pbar"><i style="width:${s.n?s.done/s.n*100:0}%"></i></div>
   <div class="pitems">${it.length?pend.map(prow).join('')+(done.length?`<div class="psec">Marcados (${done.length})</div>`+done.map(prow).join(''):''):'<p class="pempty">Nenhum item ainda.</p>'}</div>
-  <div class="cacts"><button type="button" class="soft" data-padd>Adicionar item</button><button type="button" class="solid" data-popen>Abrir</button></div></section>`;
+  <div class="cacts pacts">${SR?`<button type="button" class="soft pmic${rec&&recList===l.id?' rec':''}" data-pmic aria-label="Adicionar itens por voz">${MIC}</button>`:''}<button type="button" class="soft" data-padd>Adicionar item</button><button type="button" class="solid" data-popen>Abrir</button></div></section>`;
 }
 function render(){
   const act=lists.filter(l=>!finished(l)),fin=lists.filter(finished);
@@ -461,6 +478,7 @@ $('#cards').addEventListener('click',e=>{
   const pn=e.target.closest('.pin');
   if(pn){const l=byId(pn.dataset.id);if(!l)return;
     if(e.target.closest('[data-unpin]'))return setPin(l.id,false);
+    if(e.target.closest('[data-pmic]'))return startVoice(l.id);
     const r=e.target.closest('[data-pi]');
     if(r){const it=(l.items||[]).find(i=>i.id===r.dataset.pi);if(it){it.done=!it.done;persist(l);render()}return}
     if(e.target.closest('[data-popen],[data-padd]'))openDetail(l.id,pn,!!e.target.closest('[data-padd]'));
@@ -500,7 +518,7 @@ function openDetail(id,el,add){
     homeAnim(true);
     $('.dbar').animate([{opacity:0},{opacity:1}],{duration:460,delay:160,easing:'ease-out',fill:'backwards'});
     [...det.querySelectorAll('.dtags,#dTitle,.dsum,.dprog,.irow,.sec,.dempty,.hint')].slice(0,18).forEach((p,i)=>p.animate([{opacity:0,transform:'translateY(32px)'},{opacity:1,transform:'none'}],{duration:680,delay:120+i*34,easing:EZ,fill:'backwards'}));
-    $('#dAdd').animate([{opacity:0,transform:'translate(-50%,40px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:660,delay:320,easing:EZ,fill:'backwards'});
+    $('#dFabs').animate([{opacity:0,transform:'translate(-50%,40px)'},{opacity:1,transform:'translate(-50%,0)'}],{duration:660,delay:320,easing:EZ,fill:'backwards'});
   }
   if(add)setTimeout(()=>itemSheet(),anim?640:0);
 }
@@ -510,7 +528,7 @@ function closeDetail(){
   if(RM){det.hidden=true;return}
   const el=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`),done=()=>{if(!openId){det.hidden=true;det.getAnimations({subtree:true}).forEach(x=>x.cancel())}};
   det.querySelector('.dwrap').animate([{opacity:1,transform:'none'},{opacity:0,transform:'translateY(16px)'}],{duration:260,easing:'ease-in',fill:'forwards'});
-  $('#dAdd').animate([{opacity:1,transform:'translate(-50%,0)'},{opacity:0,transform:'translate(-50%,28px)'}],{duration:240,easing:'ease-in',fill:'forwards'});
+  $('#dFabs').animate([{opacity:1,transform:'translate(-50%,0)'},{opacity:0,transform:'translate(-50%,28px)'}],{duration:240,easing:'ease-in',fill:'forwards'});
   if(!el){det.animate([{opacity:1},{opacity:0}],{duration:340,easing:'ease',fill:'forwards'}).onfinish=done;return}
   const r=el.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)el.scrollIntoView({block:'center'});
   homeAnim(false);
@@ -572,6 +590,42 @@ $('#dPin').addEventListener('click',()=>{const l=byId(openId);if(l)setPin(l.id,p
 $('#bd').addEventListener('click',closeDetail);
 $('#dMore').addEventListener('click',()=>listSheet(openId));
 $('#dAdd').addEventListener('click',()=>itemSheet());
+/* adicionar itens por voz */
+let rec=null,recList=null,recAll='';
+const NUMW={'meia dúzia':6,'uma dúzia':12,'dúzia':12,um:1,uma:1,dois:2,duas:2,'três':3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,quinze:15,vinte:20};
+const NUMK=Object.keys(NUMW).sort((a,b)=>b.length-a.length);
+function parseSpoken(t){
+  return t.replace(/(^|\s)(e|mais|também|tambem)(?=\s|$)/gi,'$1,').split(/[,;.\n]+/).map(x=>x.trim().replace(/\s+/g,' ')).filter(Boolean).map(x=>{
+    let q=1;const m=x.match(/^(\d+(?:[.,]\d+)?)\s+(.+)$/);
+    if(m){q=parseFloat(m[1].replace(',','.'))||1;x=m[2]}
+    else{const lw=x.toLowerCase();for(const k of NUMK)if(lw.startsWith(k+' ')){q=NUMW[k];x=x.slice(k.length+1);break}}
+    x=x.replace(/^(de|do|da)\s+/i,'').trim();
+    return{name:x.charAt(0).toUpperCase()+x.slice(1),qty:q};
+  }).filter(i=>i.name.length>1);
+}
+function addSpoken(lid,t){
+  const l=byId(lid);if(!l)return;const got=parseSpoken(t);
+  if(!got.length)return toast('Não entendi os itens. Tente de novo.');
+  const add=got.map(i=>({id:rid(),done:false,name:i.name,qty:i.qty,price:null,link:'',note:''}));
+  l.items=(l.items||[]).concat(add);persist(l);if(openId)renderDetail();render();
+  const ids=new Set(add.map(i=>i.id)),n=add.length;
+  toast(n===1?`${add[0].name} adicionado`:`${n} itens adicionados`,()=>{const L=byId(lid);if(!L)return;L.items=(L.items||[]).filter(i=>!ids.has(i.id));persist(L);if(openId)renderDetail();render()});
+}
+function voUI(on){$('#vo').hidden=!on;$('#dMic').classList.toggle('rec',on);document.querySelectorAll('.pmic').forEach(b=>b.classList.toggle('rec',on));if(on)$('#voT').textContent='Fale os itens, ex.: leite, café e pão'}
+function startVoice(lid){
+  if(!SR)return toast('Este navegador não aceita ditado por voz');
+  if(rec){rec.stop();return}
+  recList=lid;recAll='';let r;
+  try{r=new SR()}catch(e){return toast('Não consegui usar o microfone aqui')}
+  rec=r;r.lang='pt-BR';r.interimResults=true;r.continuous=true;r.maxAlternatives=1;
+  r.onresult=e=>{let t='';for(let i=0;i<e.results.length;i++)t+=e.results[i][0].transcript+(e.results[i].isFinal?', ':' ');recAll=t;$('#voT').textContent=t.replace(/,\s*$/,'').trim()||'…'};
+  r.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed')toast('Permita o microfone para adicionar por voz');else if(e.error==='no-speech')toast('Não ouvi nada. Tente de novo.');else if(e.error!=='aborted')toast('A voz falhou. Tente de novo.')};
+  r.onend=()=>{if(rec!==r)return;rec=null;voUI(false);if(recAll.trim())addSpoken(recList,recAll)};
+  try{r.start();voUI(true)}catch(e){rec=null;voUI(false);toast('Não consegui iniciar o microfone')}
+}
+if(SR)$('#dMic').hidden=false;
+$('#dMic').addEventListener('click',()=>{if(openId)startVoice(openId)});
+$('#voStop').addEventListener('click',()=>{if(rec)rec.stop()});
 
 /* folhas */
 let onSubmit=null;
