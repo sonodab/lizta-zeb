@@ -443,7 +443,7 @@ const DESK=matchMedia('(min-width:960px)');
 const fromCard=el=>{if(!DESK.matches)return{clipPath:clipOf(el)};const r=el.getBoundingClientRect(),d=det.getBoundingClientRect();return{transform:`translate(${r.left-d.left}px,${r.top-d.top}px) scale(${r.width/d.width},${r.height/d.height})`}};
 const toFull=()=>DESK.matches?{transform:'none'}:{clipPath:FULL};
 function bd(on){const b=$('#bd');if(on){b.getAnimations().forEach(x=>x.cancel());b.classList.add('on');if(!RM&&DESK.matches)b.animate([{opacity:0},{opacity:1}],{duration:400,easing:'ease'})}else if(b.classList.contains('on')){if(RM||!DESK.matches)return b.classList.remove('on');b.animate([{opacity:1},{opacity:0}],{duration:420,easing:'ease',fill:'forwards'}).onfinish=()=>{if(openId)return;b.classList.remove('on');b.getAnimations().forEach(x=>x.cancel())}}}
-function homeAnim(out){
+function homeAnim(out){return;
   homeEl.style.transformOrigin=`50% ${scrollY+innerHeight/2-homeEl.offsetTop}px`;
   const a={transform:'none',opacity:1},b={transform:'scale(.95)',opacity:.5};
   homeEl.animate(out?[a,b]:[b,a],{duration:out?700:600,easing:EZ});
