@@ -174,6 +174,9 @@ input::placeholder{color:var(--mute)}
 .btn{flex:1;min-height:52px;border-radius:15px;font-size:16px;font-weight:500;background:var(--field)}
 .btn.pri{background:var(--ink);color:var(--bg)}
 .btn.bdel{color:#d23b3b;flex:0 0 auto;padding:0 18px}
+.qname{margin:2px 0 10px}.qrow{display:grid;grid-template-columns:148px minmax(0,1fr);gap:10px;align-items:center}.qrow .btn{min-height:48px}
+.sheet .added{min-height:0;margin:6px 4px 0}.sheet .added:empty{display:none}
+.more{margin-top:8px}.more summary{cursor:pointer;font-size:13.5px;color:var(--mute);padding:8px 4px;list-style-position:inside}.more .f{margin:8px 0 0}
 .btn.danger{background:#d23b3b;color:#fff}
 .added{font-size:13.5px;color:#22995a;min-height:20px;margin:2px 4px 0}
 .sheet p.msg{margin:0 0 6px;color:var(--mute)}
@@ -692,13 +695,14 @@ const hd=t=>`<div class="shd"><h3>${t}</h3><button type="button" class="x" data-
 function itemSheet(itemId){
   const l=byId(openId);if(!l)return;const it=itemId?(l.items||[]).find(i=>i.id===itemId):null;
   openSheet(hd(it?'Editar item':'Novo item')+`
-  <label class="f"><span>Nome do produto</span><input name="name" data-focus enterkeyhint="done" value="${esc(it&&it.name)}" placeholder="Ex.: Café em grãos 1 kg"></label>
-  <div class="row2"><div class="f"><span>Quantidade</span><div class="step"><button type="button" data-step="-1" aria-label="Diminuir">−</button><input name="qty" inputmode="decimal" aria-label="Quantidade" value="${it?fmtQ(it.qty):1}"><button type="button" data-step="1" aria-label="Aumentar">+</button></div></div>
-  <label class="f"><span>Preço un. (opcional)</span><input name="price" inputmode="decimal" placeholder="R$ 0,00" value="${it&&it.price!=null?String(it.price).replace('.',','):''}"></label></div>
-  <label class="f"><span>Link (opcional)</span><input name="link" type="url" inputmode="url" placeholder="Cole o link do produto" value="${esc(it&&it.link)}"></label>
-  <label class="f"><span>Observação (opcional)</span><input name="note" placeholder="Ex.: marca X, sem lactose" value="${esc(it&&it.note)}"></label>
+  <input class="qname" name="name" data-focus enterkeyhint="${it?'done':'send'}" aria-label="Nome do produto" value="${esc(it&&it.name)}" placeholder="Nome do produto">
+  <div class="qrow"><div class="step"><button type="button" data-step="-1" aria-label="Diminuir">−</button><input name="qty" inputmode="decimal" aria-label="Quantidade" value="${it?fmtQ(it.qty):1}"><button type="button" data-step="1" aria-label="Aumentar">+</button></div><button class="btn pri">${it?'Salvar':'Adicionar'}</button></div>
   <p class="added" id="added" aria-live="polite"></p>
-  <div class="sbtns">${it?'<button type="button" class="btn bdel" data-del>Excluir</button>':''}<button class="btn pri">${it?'Salvar':'Adicionar'}</button></div>`,()=>{
+  <details class="more"${it&&(it.price!=null||it.link||it.note)?' open':''}><summary>Preço, link e observação (opcional)</summary>
+  <label class="f"><span>Preço por unidade</span><input name="price" inputmode="decimal" placeholder="R$ 0,00" value="${it&&it.price!=null?String(it.price).replace('.',','):''}"></label>
+  <label class="f"><span>Link</span><input name="link" type="url" inputmode="url" placeholder="Cole o link do produto" value="${esc(it&&it.link)}"></label>
+  <label class="f"><span>Observação</span><input name="note" placeholder="Ex.: marca X, sem lactose" value="${esc(it&&it.note)}"></label></details>
+  ${it?'<div class="sbtns"><button type="button" class="btn bdel" data-del>Excluir item</button></div>':''}`,()=>{
     const f=sh.elements,name=f.name.value.trim();
     if(!name){f.name.focus();return toast('Dê um nome ao item')}
     const link=fixUrl(f.link.value);if(f.link.value.trim()&&!link){f.link.focus();return toast('Esse link não parece válido')}
