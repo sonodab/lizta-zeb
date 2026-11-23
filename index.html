@@ -173,7 +173,7 @@ input::placeholder{color:var(--mute)}
 .sbtns{display:flex;gap:10px;margin-top:16px}
 .btn{flex:1;min-height:52px;border-radius:15px;font-size:16px;font-weight:500;background:var(--field)}
 .btn.pri{background:var(--ink);color:var(--bg)}
-.btn.del{color:#d23b3b;flex:0 0 auto;padding:0 18px}
+.btn.bdel{color:#d23b3b;flex:0 0 auto;padding:0 18px}
 .btn.danger{background:#d23b3b;color:#fff}
 .added{font-size:13.5px;color:#22995a;min-height:20px;margin:2px 4px 0}
 .sheet p.msg{margin:0 0 6px;color:var(--mute)}
@@ -299,6 +299,7 @@ input::placeholder{color:var(--mute)}
 @media(max-width:959px){.wrap{position:relative;padding-bottom:calc(40px + var(--sb))}.wrap>.hello,.wrap>.who{display:none}.tabs{position:absolute;right:18px;top:calc(21px + var(--st));margin:0;gap:8px}.tabs .vb{margin:0}.nav{display:none}.search.on{margin-bottom:12px}}
 .tabs .plusb{background:var(--ink);color:var(--bg)}
 @media(min-width:960px){#tFind,#tNew{display:none}}
+@media(max-width:959px){.wrap>.tabs{margin:0!important}}
 /* abas escondidas: concluídas ficam nos Ajustes */
 .tabs [data-tab]{display:none}.tabs{min-height:0;margin:0 0 8px}.tabs .vb{margin-left:auto}
 .vfin{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:40px;margin-top:4px;padding:0 14px;border-radius:999px;background:var(--field);font-size:13.5px}.vfin i{font-style:normal;font-size:12px;color:var(--mute)}
@@ -697,7 +698,7 @@ function itemSheet(itemId){
   <label class="f"><span>Link (opcional)</span><input name="link" type="url" inputmode="url" placeholder="Cole o link do produto" value="${esc(it&&it.link)}"></label>
   <label class="f"><span>Observação (opcional)</span><input name="note" placeholder="Ex.: marca X, sem lactose" value="${esc(it&&it.note)}"></label>
   <p class="added" id="added" aria-live="polite"></p>
-  <div class="sbtns">${it?'<button type="button" class="btn del" data-del>Excluir</button>':''}<button class="btn pri">${it?'Salvar':'Adicionar'}</button></div>`,()=>{
+  <div class="sbtns">${it?'<button type="button" class="btn bdel" data-del>Excluir</button>':''}<button class="btn pri">${it?'Salvar':'Adicionar'}</button></div>`,()=>{
     const f=sh.elements,name=f.name.value.trim();
     if(!name){f.name.focus();return toast('Dê um nome ao item')}
     const link=fixUrl(f.link.value);if(f.link.value.trim()&&!link){f.link.focus();return toast('Esse link não parece válido')}
@@ -719,7 +720,7 @@ function listSheet(id){
   <input type="hidden" name="tag" value="">
   <div class="chips" aria-label="Sugestões de nome">${TAGS.map(t=>`<button type="button" data-tag="${t}">${t}</button>`).join('')}</div>
   <div class="f" style="margin-top:16px"><span>Cor</span><div class="sw">${COLORS.map(([n,c])=>`<label title="${n}"><input type="radio" name="color" value="${c}" aria-label="${n}"${c===cur?' checked':''}><span style="--s:${c}"></span></label>`).join('')}</div></div>
-  <div class="sbtns">${l?'<button type="button" class="btn del" data-dellist>Excluir</button>':''}<button class="btn pri">${l?'Salvar':'Criar lista'}</button></div>`,()=>{
+  <div class="sbtns">${l?'<button type="button" class="btn bdel" data-dellist>Excluir</button>':''}<button class="btn pri">${l?'Salvar':'Criar lista'}</button></div>`,()=>{
     const f=sh.elements,name=f.name.value.trim();
     if(!name){f.name.focus();return toast('Dê um nome à lista')}
     const color=okC(f.color.value),tag=f.tag.value.trim();
@@ -739,9 +740,9 @@ function confirmDel(l){
   openSheet(hd('Excluir lista?')+`<p class="msg">“${esc(l.name)}”${n?` e ${n} ${n===1?'item':'itens'}`:''} serão apagados. Não dá para desfazer.</p>
   <div class="sbtns"><button type="button" class="btn" data-close>Cancelar</button><button class="btn danger">Excluir</button></div>`,()=>{
     
-    closeSheet();openId===l.id&&(openId=null,document.body.classList.remove('lock'),setTheme(null),det.hidden=true,bd(false));
+    dropList(l.id);closeSheet();
+    if(openId===l.id){openId=null;document.body.classList.remove('lock');setTheme(null);det.hidden=true;bd(false)}
     render();toast('Lista excluída');
-    dropList(l.id);
   });
 }
 
