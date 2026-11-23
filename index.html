@@ -56,7 +56,7 @@ input{font:inherit;font-size:16px;color:var(--ink);width:100%;background:var(--f
 input::placeholder{color:var(--mute)}
 /* cartões */
 /* superfícies coloridas: no claro a cor da lista é o fundo; no escuro vira um tom profundo com a cor nos destaques */
-.card,#detail,.mini,.pin{--cink:#111214;--cb:light-dark(var(--c),color-mix(in srgb,var(--c) 84%,#000));--con:#111214;--cont:#fff;--conm:var(--c);--cw:light-dark(rgba(255,255,255,.55),rgba(255,255,255,.42));--cw2:light-dark(rgba(255,255,255,.62),rgba(255,255,255,.5));--cw3:light-dark(rgba(255,255,255,.28),rgba(255,255,255,.22));--cl:rgba(17,18,20,.12)}
+.card,#detail,.mini,.pin{--cink:#111214;--cb:light-dark(var(--c),color-mix(in srgb,var(--c) 84%,#000));--con:#111214;--cont:#fff;--conm:var(--c);--cw:light-dark(rgba(255,255,255,.55),rgba(0,0,0,.13));--cw2:light-dark(rgba(255,255,255,.62),rgba(0,0,0,.14));--cw3:light-dark(rgba(255,255,255,.28),rgba(0,0,0,.07));--cl:rgba(17,18,20,.12)}
 .card{--c:#a6e6b8;background:var(--cb);color:var(--cink);border-radius:26px;padding:16px 16px 14px;margin-bottom:12px;cursor:pointer;transition:transform .35s cubic-bezier(.32,.72,0,1)}
 .card:active{transform:scale(.975)}
 .ctop{display:flex;gap:6px;align-items:center}
@@ -69,7 +69,7 @@ input::placeholder{color:var(--mute)}
 .cmid{display:flex;gap:12px;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--cl)}
 .cmid p{margin:0;font-size:13px;line-height:1.35;opacity:.75;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .bub{display:flex;flex:none;padding-left:7px}
-.bub span{width:30px;height:30px;border-radius:50%;margin-left:-7px;display:grid;place-items:center;font-size:11.5px;font-weight:600;background:light-dark(#fff,color-mix(in srgb,var(--c) 36%,#1b1c1f));border:2px solid var(--cb)}
+.bub span{width:30px;height:30px;border-radius:50%;margin-left:-7px;display:grid;place-items:center;font-size:11.5px;font-weight:600;background:light-dark(#fff,color-mix(in srgb,var(--c) 66%,#000));border:2px solid var(--cb)}
 .bub span.more{background:var(--cw)}
 .cmeta{display:flex;align-items:center;gap:12px;margin:14px 0 2px;font-size:13px}
 .pbar{flex:1;height:6px;border-radius:9px;background:var(--cl);overflow:hidden}
@@ -113,7 +113,7 @@ input::placeholder{color:var(--mute)}
 .items{display:flex;flex-direction:column;gap:8px}
 .irow{position:relative}
 .irow.drag{z-index:3}
-.irow.drag .item{background:light-dark(color-mix(in srgb,var(--c) 38%,#fff),color-mix(in srgb,var(--c) 34%,#1f2023));box-shadow:0 14px 30px rgba(0,0,0,.2)}
+.irow.drag .item{background:light-dark(color-mix(in srgb,var(--c) 38%,#fff),color-mix(in srgb,var(--c) 72%,#000));box-shadow:0 14px 30px rgba(0,0,0,.2)}
 .del{position:absolute;right:0;top:0;bottom:0;width:0;border-radius:18px;background:#d23b3b;color:#fff;display:grid;place-items:center;overflow:hidden}
 .del.go{background:#a61f1f}
 .del svg{flex:none}
@@ -287,6 +287,10 @@ input::placeholder{color:var(--mute)}
 /* sem "Olá"; no celular, ajustes no topo à direita */
 .wrap>.hello{display:none}
 @media(max-width:959px){.wrap{position:relative}.wrap>.hello,.wrap>.who{display:none}.tabs{margin:12px 0 8px}.tabs .vb{position:absolute;right:18px;top:calc(21px + var(--st));margin:0}}
+/* abas escondidas: concluídas ficam nos Ajustes */
+.tabs [data-tab]{display:none}.tabs{min-height:0;margin:0 0 8px}.tabs .vb{margin-left:auto}
+.vfin{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:40px;margin-top:4px;padding:0 14px;border-radius:999px;background:var(--field);font-size:13.5px}.vfin i{font-style:normal;font-size:12px;color:var(--mute)}
+.finbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 2px 12px}.finbar b{font-size:20px;letter-spacing:-.02em;font-weight:600}.finbar button{min-height:40px;padding:0 16px;border-radius:999px;background:var(--soft);font-size:14px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -458,6 +462,7 @@ function pinPanel(l){
   <div class="pitems">${it.length?pend.map(prow).join('')+(done.length?`<div class="psec">Marcados (${done.length})</div>`+done.map(prow).join(''):''):'<p class="pempty">Nenhum item ainda.</p>'}</div>
   <div class="cacts pacts">${SR?`<button type="button" class="soft pmic${rec&&recList===l.id?' rec':''}" data-pmic aria-label="Adicionar itens por voz">${MIC}</button>`:''}<button type="button" class="soft" data-padd>Adicionar item</button><button type="button" class="solid" data-popen>Abrir</button></div></section>`;
 }
+function setTab(t){tab=t;scrollTo({top:0});render()}
 function render(){
   const act=lists.filter(l=>!finished(l)),fin=lists.filter(finished);
   $('#cA').textContent=act.length;$('#cF').textContent=fin.length;
@@ -469,11 +474,12 @@ function render(){
   if(pinned)show=show.filter(l=>l.id!==pinned.id);
   let html=show.map(card).join('');
   if(pinned)html=pinPanel(pinned)+`<div class="rest">${html||'<p class="pempty rhint">Suas outras listas aparecem aqui.</p>'}</div>`;
-  else if(!show.length){
+  else if(!show.length&&tab!=='ok'||query&&!show.length){
     if(query)html=`<div class="empty"><h3>Nada encontrado</h3><p>Nenhuma lista ou item com “${esc(query)}”.</p></div>`;
     else if(tab==='ok')html=`<div class="empty"><h3>Nada concluído ainda</h3><p>Quando todos os itens de uma lista forem marcados, ela aparece aqui.</p></div>`;
     else html=`<div class="empty"><div class="pile" aria-hidden="true"><div class="a"></div><div class="b"></div><div class="c"></div></div><h3>${lists.length?'Tudo concluído':'Nenhuma lista ainda'}</h3><p>Crie uma lista para o mercado, compras online ou o que precisar.</p><button class="cta" data-new>Criar lista</button></div>`;
   }
+  if(tab==='ok'&&!query)html=`<div class="finbar"><b>Listas concluídas</b><button type="button" data-back>Voltar às listas</button></div>`+(html||'<div class="empty"><h3>Nada concluído ainda</h3><p>Quando todos os itens de uma lista forem marcados, ela aparece aqui.</p></div>');
   const pi=$('#cards .pitems'),pst=pi?pi.scrollTop:0;
   $('#cards').classList.toggle('haspin',!!pinned);$('#cards').innerHTML=html;
   const pi2=$('#cards .pitems');if(pi2&&pst)pi2.scrollTop=pst;
@@ -481,6 +487,7 @@ function render(){
 }
 $('#cards').addEventListener('click',e=>{
   if(e.target.closest('[data-new]'))return listSheet();
+  if(e.target.closest('[data-back]'))return setTab('ativas');
   const pn=e.target.closest('.pin');
   if(pn){const l=byId(pn.dataset.id);if(!l)return;
     if(e.target.closest('[data-unpin]'))return setPin(l.id,false);
@@ -495,7 +502,7 @@ $('#cards').addEventListener('click',e=>{
 $('#cards').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList.contains('card'))openDetail(e.target.dataset.id,e.target)});
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>vt(()=>{tab=b.dataset.tab;document.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));render()})));
 $('#q').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();render()});
-$('#nList').addEventListener('click',()=>{query='';$('#q').value='';$('#search').classList.remove('on');$('#nFind').classList.remove('on');scrollTo({top:0,behavior:RM?'auto':'smooth'});render()});
+$('#nList').addEventListener('click',()=>{query='';tab='ativas';$('#q').value='';$('#search').classList.remove('on');$('#nFind').classList.remove('on');scrollTo({top:0,behavior:RM?'auto':'smooth'});render()});
 $('#nFind').addEventListener('click',()=>{const on=$('#search').classList.toggle('on');$('#nFind').classList.toggle('on',on);if(on){scrollTo({top:0});$('#q').focus()}else{query='';$('#q').value='';render()}});
 $('#nNew').addEventListener('click',()=>listSheet());
 $('#nNew2').addEventListener('click',()=>listSheet());
@@ -648,6 +655,7 @@ sh.addEventListener('click',e=>{
   if(e.target.closest('[data-close]'))return closeSheet();
   if(e.target.closest('[data-copy]')){const v=$('#mylink').value;const done=()=>toast('Link copiado');if(navigator.clipboard)navigator.clipboard.writeText(v).then(done,()=>{$('#mylink').select();toast('Selecionei o link: copie manualmente')});else{$('#mylink').select();document.execCommand('copy');done()}return}
   if(e.target.closest('[data-join]'))return joinCode($('#join').value);
+  if(e.target.closest('[data-fin]')){setTab(tab==='ok'?'ativas':'ok');return closeSheet()}
   const st=e.target.closest('[data-step]');if(st){const inp=sh.elements.qty;inp.value=fmtQ(Math.max(1,Math.round((parseNum(inp.value)||1)+ +st.dataset.step)));return}
   const t=e.target.closest('[data-tag]');if(t){sh.elements.tag.value=t.dataset.tag;return}
 });
@@ -791,6 +799,7 @@ function viewSheet(){
   <div class="vrow"><span>Interface</span>${seg('dens',view.d,[['c','Confortável'],['k','Compacta'],['m','Mínima']])}</div>
   <div class="vrow"><span>Textos</span>${seg('txt',view.t,[['f','Completos'],['s','Resumidos'],['e','Essencial']])}</div>
   <div class="vrow"><span>Tema</span>${seg('mode',view.m,[['a','Auto'],['l','Claro'],['d','Escuro']])}</div>
+  <button type="button" class="vfin" data-fin>${tab==='ok'?'Voltar às listas':`Listas concluídas <i>${lists.filter(finished).length}</i>`}</button>
   <details class="sync"><summary>Sincronizar com outro aparelho<small>${online?'Sincronizado':'Não sincronizado'}</small></summary>
   <div class="syncbox"><p>Abra este link no outro aparelho (ou cole lá o código) para ver as mesmas listas. Guarde-o: é a chave das suas listas.</p>
   <input id="mylink" readonly value="${esc(location.origin+'/?k='+key)}" aria-label="Seu link de acesso">
