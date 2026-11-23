@@ -189,6 +189,13 @@ input::placeholder{color:var(--mute)}
 .seg span{transition:background-color .3s ease,box-shadow .3s ease;display:block;text-align:center;font-size:14px;line-height:40px;border-radius:11px;white-space:nowrap}
 .seg input:checked+span{background:var(--sheet);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.12)}
 .seg input:focus-visible+span{outline:2px solid #3a7bff;outline-offset:1px}
+#scrim.clear{background:transparent}
+.sheet.top{top:calc(8px + var(--st));bottom:auto;left:8px;right:8px;max-width:520px;border-radius:22px;padding:8px 12px 12px;transform:translateY(calc(-100% - 40px));box-shadow:0 18px 50px rgba(0,0,0,.22);max-height:calc(100dvh - 24px)}
+.sheet.top.on{transform:none}
+.sheet.top .grab{display:none}.sheet.top .shd{margin-bottom:6px}.sheet.top .shd h3{font-size:17px}.sheet.top .x{width:36px;height:36px}
+.vrow{display:grid;grid-template-columns:70px minmax(0,1fr);align-items:center;gap:8px;margin-bottom:6px}.vrow>span{font-size:13px;color:var(--mute)}.vrow .seg{padding:3px;border-radius:12px}.vrow .seg span{line-height:32px;font-size:13px;border-radius:9px}
+.sync{margin-top:6px}.sync summary{cursor:pointer;font-size:13.5px;padding:8px 2px}.sync summary small{color:var(--mute);margin-left:6px}.sync .syncbox{margin-top:4px}
+@media(min-width:960px){.sheet.top{left:auto;right:clamp(28px,4vw,72px);top:84px;width:440px;margin:0}}
 /* densidade da interface: k = compacta, m = mínima */
 [data-d=k] .hello{font-size:clamp(38px,11vw,48px)}
 [data-d=k] .tabs{margin:20px 0 8px}
@@ -526,7 +533,7 @@ $('#dAdd').addEventListener('click',()=>itemSheet());
 
 /* folhas */
 let onSubmit=null;
-function openSheet(html,fn){sh.innerHTML='<div class="grab"></div>'+html;onSubmit=fn;scrim.classList.add('on');requestAnimationFrame(()=>sh.classList.add('on'));setTimeout(()=>{const f=sh.querySelector('[data-focus]');if(f)f.focus()},RM?0:440)}
+function openSheet(html,fn,top){if(sh.classList.contains('top')!==!!top){sh.style.transition='none';sh.classList.toggle('top',!!top);void sh.offsetWidth;sh.style.transition=''}scrim.classList.toggle('clear',!!top);sh.innerHTML='<div class="grab"></div>'+html;onSubmit=fn;scrim.classList.add('on');requestAnimationFrame(()=>sh.classList.add('on'));setTimeout(()=>{const f=sh.querySelector('[data-focus]');if(f)f.focus()},RM?0:440)}
 function closeSheet(){sh.classList.remove('on');scrim.classList.remove('on');onSubmit=null}
 sh.addEventListener('submit',e=>{e.preventDefault();if(onSubmit)onSubmit()});
 scrim.addEventListener('click',closeSheet);
@@ -674,17 +681,15 @@ function vmsg(){const m=$('#vmsg');if(m)m.textContent=VD[view.d]+' '+VT[view.t]}
 function viewSheet(){
   const seg=(n,cur,o)=>`<div class="seg">${o.map(([v,t])=>`<label><input type="radio" name="${n}" value="${v}"${v===cur?' checked':''}><span>${t}</span></label>`).join('')}</div>`;
   openSheet(hd('Ajustes')+`
-  <div class="f"><span>Interface</span>${seg('dens',view.d,[['c','Confortável'],['k','Compacta'],['m','Mínima']])}</div>
-  <div class="f"><span>Textos</span>${seg('txt',view.t,[['f','Completos'],['s','Resumidos'],['e','Essencial']])}</div>
-  <div class="f"><span>Tema</span>${seg('mode',view.m,[['a','Automático'],['l','Claro'],['d','Escuro']])}</div>
-  <p class="msg" id="vmsg"></p>
-  <div class="f" style="margin-top:18px"><span>Sincronizar com outro aparelho</span>
-  <div class="syncbox"><p>${online?'Sincronizado.':'Ainda não sincronizado.'} Abra este link no outro aparelho (ou cole lá o código) para ver as mesmas listas. Guarde-o: é a chave das suas listas.</p>
+  <div class="vrow"><span>Interface</span>${seg('dens',view.d,[['c','Confortável'],['k','Compacta'],['m','Mínima']])}</div>
+  <div class="vrow"><span>Textos</span>${seg('txt',view.t,[['f','Completos'],['s','Resumidos'],['e','Essencial']])}</div>
+  <div class="vrow"><span>Tema</span>${seg('mode',view.m,[['a','Auto'],['l','Claro'],['d','Escuro']])}</div>
+  <details class="sync"><summary>Sincronizar com outro aparelho<small>${online?'Sincronizado':'Não sincronizado'}</small></summary>
+  <div class="syncbox"><p>Abra este link no outro aparelho (ou cole lá o código) para ver as mesmas listas. Guarde-o: é a chave das suas listas.</p>
   <input id="mylink" readonly value="${esc(location.origin+'/?k='+key)}" aria-label="Seu link de acesso">
   <div class="sbtns" style="margin-top:8px"><button type="button" class="btn" data-copy>Copiar link</button></div>
   <input id="join" placeholder="Colar link ou código de outro aparelho" style="margin-top:12px" autocomplete="off">
-  <div class="sbtns" style="margin-top:8px"><button type="button" class="btn" data-join>Conectar a essas listas</button></div></div></div>
-  <div class="sbtns"><button class="btn pri">Pronto</button></div>`,closeSheet);
+  <div class="sbtns" style="margin-top:8px"><button type="button" class="btn" data-join>Conectar a essas listas</button></div></div></details>`,closeSheet,true);
   vmsg();
 }
 sh.addEventListener('change',e=>{const k={dens:'d',txt:'t',mode:'m'}[e.target.name];if(!k)return;const v=e.target.value;vt(()=>{view[k]=v;applyView(true);vmsg()})});
