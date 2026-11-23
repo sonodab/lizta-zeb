@@ -21,7 +21,7 @@
    PICTURE: a própria pilha de cartões pastel, e a tela cheia da cor ao abrir
    COLOUR and TYPE: fundo branco, tinta preta, cores pastel escolhidas por lista; Inter Tight
    LAYOUT: "Olá" grande, abas, pilha de cartões, barra escura flutuante; detalhe em tela cheia */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0c0d0f);--ink:light-dark(#0f1012,#f3f3f1);--mute:light-dark(#8a8d93,#8d9097);--line:light-dark(#e6e6e3,#2a2c31);--soft:light-dark(#f3f3f1,#1a1b1e);--sheet:light-dark(#ffffff,#16171a);--field:light-dark(#f2f2f0,#232529);--dark:light-dark(#111214,#1d1f23);--cink:light-dark(#111214,#f4f4f2);--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
+:root{color-scheme:light dark;--bg:light-dark(#e7e7e4,#0c0d0f);--ink:light-dark(#0f1012,#f3f3f1);--mute:light-dark(#8a8d93,#8d9097);--line:light-dark(#e6e6e3,#2a2c31);--soft:light-dark(#d9d9d5,#1a1b1e);--sheet:light-dark(#ffffff,#16171a);--field:light-dark(#f2f2f0,#232529);--dark:light-dark(#111214,#1d1f23);--cink:light-dark(#111214,#f4f4f2);--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 :root[data-mode=l]{color-scheme:light}:root[data-mode=d]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
@@ -87,7 +87,7 @@ input::placeholder{color:var(--mute)}
 .pile div::after{width:38%}
 .pile .a{top:8px;background:#d2c8f7;transform:rotate(-8deg)}.pile .b{top:30px;background:#f5e08c;transform:rotate(5deg)}.pile .c{top:54px;background:#a6e6b8}
 .cta{min-height:52px;padding:0 24px;border-radius:16px;background:var(--ink);color:var(--bg);font-weight:500}
-@media(min-width:960px){.wrap{max-width:1040px}#cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}.card,.sk{margin:0}#cards>.empty{grid-column:1/-1}}
+@media(min-width:960px){.wrap{max-width:none;padding-inline:clamp(28px,4vw,72px)}.dwrap{max-width:980px}#cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;align-items:start}.card,.sk{margin:0}#cards>.empty{grid-column:1/-1}}
 /* barra inferior */
 .nav{position:fixed;left:50%;bottom:calc(14px + var(--sb));transform:translateX(-50%);width:min(360px,calc(100% - 28px));background:var(--dark);color:#fff;border-radius:22px;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;padding:6px 8px;box-shadow:0 12px 32px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.07);z-index:5}
 .nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;min-height:52px;opacity:.55}
@@ -319,7 +319,7 @@ const byId=id=>lists.find(l=>l.id===id);
 function toast(t,undo){const el=$('#toast');el.textContent=t;el.classList.toggle('act',!!undo);if(undo){const b=document.createElement('button');b.type='button';b.textContent='Desfazer';b.onclick=()=>{el.classList.remove('on');undo()};el.append(b)}el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),undo?5500:2200)}
 function setNote(t){const n=$('#note');n.textContent=t;n.hidden=!t}
 function isDark(){const t=document.documentElement.dataset.theme;return view.m==='d'||(view.m==='a'&&(t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches))}
-function setTheme(){const l=openId&&byId(openId),d=isDark();let v=d?'#0c0d0f':'#ffffff';if(l){const c=okC(l.color);v=d?'#'+hex2(c).map((x,i)=>Math.round(x*.26+[18,19,21][i]*.74).toString(16).padStart(2,'0')).join(''):c}$('#tc').content=v}
+function setTheme(){const l=openId&&byId(openId),d=isDark();let v=d?'#0c0d0f':'#e7e7e4';if(l){const c=okC(l.color);v=d?'#'+hex2(c).map((x,i)=>Math.round(x*.26+[18,19,21][i]*.74).toString(16).padStart(2,'0')).join(''):c}$('#tc').content=v}
 function vt(fn){if(RM||!document.startViewTransition)return fn();let t;try{t=document.startViewTransition(fn)}catch(e){return fn()}for(const k of ['ready','finished','updateCallbackDone'])if(t&&t[k])t[k].catch(()=>{})}
 
 /* armazenamento: cópia local + sincronização pela API (/api/lists) */
