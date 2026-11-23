@@ -286,7 +286,9 @@ input::placeholder{color:var(--mute)}
 .nav,.nav .plus,.fab,.micb,.soft,.solid,.btn,.cta,#vo,#vo button,.seg,.seg span,.tabs .newb,.chips button,.step,.x,.rb,.vb{border-radius:999px}
 /* sem "Olá"; no celular, ajustes no topo à direita */
 .wrap>.hello{display:none}
-@media(max-width:959px){.wrap{position:relative}.wrap>.hello,.wrap>.who{display:none}.tabs{margin:12px 0 8px}.tabs .vb{position:absolute;right:18px;top:calc(21px + var(--st));margin:0}}
+@media(max-width:959px){.wrap{position:relative;padding-bottom:calc(40px + var(--sb))}.wrap>.hello,.wrap>.who{display:none}.tabs{position:absolute;right:18px;top:calc(21px + var(--st));margin:0;gap:8px}.tabs .vb{margin:0}.nav{display:none}.search.on{margin-bottom:12px}}
+.tabs .plusb{background:var(--ink);color:var(--bg)}
+@media(min-width:960px){#tFind,#tNew{display:none}}
 /* abas escondidas: concluídas ficam nos Ajustes */
 .tabs [data-tab]{display:none}.tabs{min-height:0;margin:0 0 8px}.tabs .vb{margin-left:auto}
 .vfin{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:40px;margin-top:4px;padding:0 14px;border-radius:999px;background:var(--field);font-size:13.5px}.vfin i{font-style:normal;font-size:12px;color:var(--mute)}
@@ -302,7 +304,7 @@ input::placeholder{color:var(--mute)}
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-tab="ativas">Listas <i id="cA">0</i></button>
     <button role="tab" aria-selected="false" data-tab="ok">Concluídas <i id="cF">0</i></button>
-    <button class="vb" id="vBtn" aria-label="Ajustes e sincronização"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg></button>
+    <button class="vb" id="tFind" aria-label="Buscar listas e itens"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></svg></button><button class="vb plusb" id="tNew" aria-label="Nova lista"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button class="vb" id="vBtn" aria-label="Ajustes e sincronização"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg></button>
     <button class="newb" id="nNew2"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova lista</button>
   </div>
   <div class="search" id="search"><input id="q" type="search" placeholder="Buscar listas e itens" autocomplete="off"></div>
@@ -435,7 +437,8 @@ function joinCode(v){
 /* home */
 function card(l){
   const s=stats(l),it=l.items||[],pend=it.filter(i=>!i.done),src=pend.length?pend:it;
-  const prev=src.slice(0,4).map(i=>i.name).join(', ')+(src.length>4?'…':'');
+  const hits=query?it.filter(i=>(i.name+' '+(i.note||'')).toLowerCase().includes(query)):[];
+  const prev=hits.length?'Encontrado: '+hits.slice(0,4).map(i=>i.name).join(', ')+(hits.length>4?'…':''):src.slice(0,4).map(i=>i.name).join(', ')+(src.length>4?'…':'');
   const b=src.slice(0,3).map(i=>`<span>${esc((i.name||'?').trim().charAt(0).toUpperCase())}</span>`).join('');
   const more=src.length>3?`<span class="more">${src.length-3}+</span>`:'';
   return `<article class="card" data-id="${esc(l.id)}" style="--c:${okC(l.color)}" tabindex="0" aria-label="Abrir ${esc(l.name)}">
@@ -505,6 +508,8 @@ $('#q').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();r
 $('#nList').addEventListener('click',()=>{query='';tab='ativas';$('#q').value='';$('#search').classList.remove('on');$('#nFind').classList.remove('on');scrollTo({top:0,behavior:RM?'auto':'smooth'});render()});
 $('#nFind').addEventListener('click',()=>{const on=$('#search').classList.toggle('on');$('#nFind').classList.toggle('on',on);if(on){scrollTo({top:0});$('#q').focus()}else{query='';$('#q').value='';render()}});
 $('#nNew').addEventListener('click',()=>listSheet());
+$('#tNew').addEventListener('click',()=>listSheet());
+$('#tFind').addEventListener('click',()=>{$('#nFind').click();$('#tFind').classList.toggle('on',$('#search').classList.contains('on'))});
 $('#nNew2').addEventListener('click',()=>listSheet());
 
 /* detalhe */
@@ -608,11 +613,14 @@ let rec=null,recList=null,recAll='';
 const NUMW={'meia dúzia':6,'uma dúzia':12,'dúzia':12,um:1,uma:1,dois:2,duas:2,'três':3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,quinze:15,vinte:20};
 const NUMK=Object.keys(NUMW).sort((a,b)=>b.length-a.length);
 function parseSpoken(t){
+  const W=NUMK.map(k=>k.replace(/ /g,'\\s+')).join('|'),N='(\\d+(?:[.,]\\d+)?|'+W+')';
+  const num=v=>/^\d/.test(v)?(parseFloat(v.replace(',','.'))||1):(NUMW[v.toLowerCase().replace(/\s+/g,' ')]||1);
+  const lead=new RegExp('^'+N+'\\s*(?:x|vezes)?\\s+(.+)$','i'),tail=new RegExp('^(.+?)\\s+'+N+'\\s*(?:x|vezes|unidades?|un\\.?)$','i');
   return t.replace(/(^|\s)(e|mais|também|tambem)(?=\s|$)/gi,'$1,').split(/[,;.\n]+/).map(x=>x.trim().replace(/\s+/g,' ')).filter(Boolean).map(x=>{
-    let q=1;const m=x.match(/^(\d+(?:[.,]\d+)?)\s+(.+)$/);
-    if(m){q=parseFloat(m[1].replace(',','.'))||1;x=m[2]}
-    else{const lw=x.toLowerCase();for(const k of NUMK)if(lw.startsWith(k+' ')){q=NUMW[k];x=x.slice(k.length+1);break}}
-    x=x.replace(/^(de|do|da)\s+/i,'').trim();
+    let q=1,m;
+    if(m=x.match(lead)){q=num(m[1]);x=m[2]}
+    else if(m=x.match(tail)){q=num(m[2]);x=m[1]}
+    x=x.replace(/^(unidades?|un\.?)\s+/i,'').replace(/^(de|do|da)\s+/i,'').replace(/\s+(unidades?|un\.?)$/i,'').trim();
     return{name:x.charAt(0).toUpperCase()+x.slice(1),qty:q};
   }).filter(i=>i.name.length>1);
 }
