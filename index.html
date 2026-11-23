@@ -56,7 +56,7 @@ input{font:inherit;font-size:16px;color:var(--ink);width:100%;background:var(--f
 input::placeholder{color:var(--mute)}
 /* cartões */
 /* superfícies coloridas: no claro a cor da lista é o fundo; no escuro vira um tom profundo com a cor nos destaques */
-.card,#detail,.mini,.pin{--cink:#111214;--cb:light-dark(var(--c),color-mix(in srgb,var(--c) 84%,#000));--con:#111214;--cont:#fff;--conm:var(--c);--cw:light-dark(rgba(255,255,255,.55),rgba(0,0,0,.13));--cw2:light-dark(rgba(255,255,255,.62),rgba(0,0,0,.14));--cw3:light-dark(rgba(255,255,255,.28),rgba(0,0,0,.07));--cl:rgba(17,18,20,.12)}
+.card,#detail,.mini,.pin{--cink:#111214;--ringc:color-mix(in srgb,var(--c) 42%,#111214);--cb:light-dark(var(--c),color-mix(in srgb,var(--c) 84%,#000));--con:#111214;--cont:#fff;--conm:var(--c);--cw:light-dark(rgba(255,255,255,.55),rgba(0,0,0,.13));--cw2:light-dark(rgba(255,255,255,.62),rgba(0,0,0,.14));--cw3:light-dark(rgba(255,255,255,.28),rgba(0,0,0,.07));--cl:rgba(17,18,20,.12)}
 .card{--c:#a6e6b8;background:var(--cb);color:var(--cink);border-radius:26px;padding:16px 16px 14px;margin-bottom:12px;cursor:pointer;transition:transform .35s cubic-bezier(.32,.72,0,1)}
 .card:active{transform:scale(.975)}
 .ctop{display:flex;gap:6px;align-items:center}
@@ -136,7 +136,8 @@ input::placeholder{color:var(--mute)}
 .inote{flex-basis:100%;overflow-wrap:anywhere}
 .ipr{font-weight:600;font-size:14.5px;white-space:nowrap;padding-right:6px}
 .sec{display:flex;justify-content:space-between;align-items:center;margin:20px 4px 6px;font-size:13.5px}
-.sec span{opacity:.65}.sec button{text-decoration:underline;text-underline-offset:2px;min-height:44px}
+.sec span{opacity:.65}
+.secb{display:flex;align-items:center;gap:6px}.sec .secdel{width:38px;height:38px;min-height:0;border-radius:50%;display:grid;place-items:center;background:var(--cw);text-decoration:none}.secdel svg{width:18px;height:18px}.sec button{text-decoration:underline;text-underline-offset:2px;min-height:44px}
 .dempty{text-align:center;padding:40px 10px}
 .dempty p{opacity:.7;margin:0 0 18px}
 .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + var(--sb));background:var(--con);color:var(--cont);border-radius:18px;height:56px;padding:0 26px;display:flex;align-items:center;gap:8px;font-size:15.5px;font-weight:500;box-shadow:0 12px 30px rgba(0,0,0,.22);z-index:11;white-space:nowrap}
@@ -191,6 +192,15 @@ input::placeholder{color:var(--mute)}
 .seg span{transition:background-color .3s ease,box-shadow .3s ease;display:block;text-align:center;font-size:14px;line-height:40px;border-radius:11px;white-space:nowrap}
 .seg input:checked+span{background:var(--sheet);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.12)}
 .seg input:focus-visible+span{outline:2px solid #3a7bff;outline-offset:1px}
+/* anel de progresso */
+.ring{position:relative;flex:none;width:48px;height:48px;display:grid;place-items:center;margin-left:auto}
+.ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:3.6}.ring .rt{stroke:var(--cl)}.ring .rf{stroke:var(--ringc);stroke-linecap:round}
+.ring b{position:relative;font-size:15px;font-weight:600;line-height:1;letter-spacing:-.02em}.ring small{font-size:9.5px;font-weight:500;opacity:.6;margin-left:1px}
+.cmeta{justify-content:space-between}.cmeta span{opacity:.6}.cmeta b{font-weight:600;white-space:nowrap}
+.pin .ptitle{display:flex;align-items:center;gap:12px}.ptx{flex:1;min-width:0}.ptx>span{font-size:13.5px;opacity:.7}
+.dhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-top:8px}.dhead .dtags{margin-top:4px}#dRing .ring{width:56px;height:56px}#dRing .ring b{font-size:17px}
+#detail .dsum{margin-bottom:16px}
 /* voz */
 .fabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + var(--sb));z-index:11;display:flex;gap:10px;align-items:center}
 .fabs .fab{position:static;transform:none}
@@ -326,10 +336,9 @@ input::placeholder{color:var(--mute)}
       <div class="dr"><button class="rb" id="dPin" aria-label="Fixar no topo"><svg class="i" viewBox="0 0 24 24"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"/><path d="M12 15v6"/></svg></button><button class="rb" id="dView" aria-label="Visualização"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg></button>
       <button class="rb" id="dMore" aria-label="Editar lista"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg></button></div>
     </div>
-    <div class="dtags" id="dTags"></div>
+    <div class="dhead"><div class="dtags" id="dTags"></div><div id="dRing"></div></div>
     <h1 id="dTitle"></h1>
     <div class="dsum"><span id="dSub"></span><b id="dTot"></b></div>
-    <div class="pbar dprog"><i id="dBar"></i></div>
     <div id="items"></div>
   </div>
   <div class="fabs" id="dFabs"><button class="micb" id="dMic" aria-label="Adicionar itens por voz" hidden><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button><button class="fab" id="dAdd"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Adicionar item</button></div>
@@ -345,7 +354,7 @@ input::placeholder{color:var(--mute)}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=[['Verde','#a6e6b8'],['Lima','#dcf27a'],['Amarelo','#f5e08c'],['Laranja','#f9c99d'],['Rosa','#f7c3d3'],['Lilás','#d2c8f7'],['Azul','#bcd9f7'],['Menta','#b6ece2'],['Cinza','#dfe2e6']];
-const TAGS=['Mercado','Online','Casa','Presentes','Farmácia','Viagem'];
+const TAGS=['Mercado','Online','Comprinhas','Casa','Presentes','Farmácia','Viagem'];
 const brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>setTheme());
@@ -442,10 +451,10 @@ function card(l){
   const b=src.slice(0,3).map(i=>`<span>${esc((i.name||'?').trim().charAt(0).toUpperCase())}</span>`).join('');
   const more=src.length>3?`<span class="more">${src.length-3}+</span>`:'';
   return `<article class="card" data-id="${esc(l.id)}" style="--c:${okC(l.color)}" tabindex="0" aria-label="Abrir ${esc(l.name)}">
-  <div class="ctop">${l.tag?`<span class="tag">${esc(l.tag)}</span>`:''}<span class="tag">${s.n} ${s.n===1?'item':'itens'}</span><span class="ago">${ago(l.updated)}</span></div>
-  <div class="cttl"><span class="mono">${esc((l.name||'?').trim().charAt(0).toUpperCase())}</span><div><h2>${esc(l.name)}</h2><small>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}</small></div></div>
+  <div class="ctop"><span class="tag">${s.n} ${s.n===1?'item':'itens'}</span><span class="ago">${ago(l.updated)}</span></div>
+  <div class="cttl"><span class="mono">${esc((l.name||'?').trim().charAt(0).toUpperCase())}</span><div><h2>${esc(l.name)}</h2><small>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}</small></div>${s.n?ring(s.done,s.n):''}</div>
   <div class="cmid"><p>${prev?esc(prev):'Toque para adicionar o primeiro item'}</p>${it.length?`<div class="bub">${more}${b}</div>`:''}</div>
-  <div class="cmeta"><div class="pbar"><i style="width:${s.n?s.done/s.n*100:0}%"></i></div>${s.priced?`<span>${brl.format(s.total)}</span>`:''}</div></article>`;
+  ${s.priced?`<div class="cmeta"><span>Total</span><b>${brl.format(s.total)}</b></div>`:''}</article>`;
 }
 const finished=l=>{const s=stats(l);return s.n>0&&s.done===s.n};
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
@@ -459,13 +468,13 @@ function pinPanel(l){
   const s=stats(l),it=l.items||[],pend=it.filter(i=>!i.done),done=it.filter(i=>i.done);
   const prow=i=>`<button type="button" class="item pitem${i.done?' done':''}" data-pi="${esc(i.id)}"><span class="chk" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></span><span class="ib"><span class="iname"><b>${esc(i.name)}</b><span class="qty">×${fmtQ(i.qty)}</span></span>${i.note?`<span class="imeta"><span class="inote">${esc(i.note)}</span></span>`:''}</span>${i.price!=null?`<span class="ipr">${brl.format(i.price*(i.qty||1))}</span>`:''}</button>`;
   return `<section class="pin" data-id="${esc(l.id)}" style="--c:${okC(l.color)}" aria-label="Lista fixada: ${esc(l.name)}">
-  <div class="ctop">${l.tag?`<span class="tag">${esc(l.tag)}</span>`:''}<span class="tag">Fixada</span><button type="button" class="pbtn" data-unpin aria-label="Desafixar lista">${PIN}</button></div>
-  <button type="button" class="ptitle" data-popen><h2>${esc(l.name)}</h2><span>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}${s.priced?` · ${brl.format(s.total)}`:''}</span></button>
-  <div class="pbar"><i style="width:${s.n?s.done/s.n*100:0}%"></i></div>
+  <div class="ctop"><span class="tag">Fixada</span><button type="button" class="pbtn" data-unpin aria-label="Desafixar lista">${PIN}</button></div>
+  <button type="button" class="ptitle" data-popen><span class="ptx"><h2>${esc(l.name)}</h2><span>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}${s.priced?` · ${brl.format(s.total)}`:''}</span></span>${s.n?ring(s.done,s.n):''}</button>
   <div class="pitems">${it.length?pend.map(prow).join('')+(done.length?`<button type="button" class="psec" data-popen>${pend.length?'':'Tudo marcado! '}${done.length} ${done.length===1?'marcado':'marcados'} · ver na lista</button>`:''):'<p class="pempty">Nenhum item ainda.</p>'}</div>
   <div class="cacts pacts">${SR?`<button type="button" class="soft pmic${rec&&recList===l.id?' rec':''}" data-pmic aria-label="Adicionar itens por voz">${MIC}</button>`:''}<button type="button" class="soft" data-padd>Adicionar item</button><button type="button" class="solid" data-popen>Abrir</button></div></section>`;
 }
 function setTab(t){tab=t;scrollTo({top:0});render()}
+function ring(d,n){const p=n?Math.round(d/n*100):0;return `<span class="ring" role="img" aria-label="${d} de ${n} marcados"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rt" cx="18" cy="18" r="15.5"/>${p?`<circle class="rf" cx="18" cy="18" r="15.5" pathLength="100" stroke-dasharray="${p} 100"/>`:''}</svg><b>${d}<small>/${n}</small></b></span>`}
 function render(){
   const act=lists.filter(l=>!finished(l)),fin=lists.filter(finished);
   $('#cA').textContent=act.length;$('#cF').textContent=fin.length;
@@ -572,19 +581,27 @@ function row(i){
   <div class="ib" data-edit tabindex="0"><div class="iname"><b>${esc(i.name)}</b><span class="qty">×${fmtQ(i.qty)}</span>${i.link?`<a class="lk" href="${esc(i.link)}" target="_blank" rel="noopener" aria-label="Abrir link de ${esc(i.name)}">↗</a>`:''}</div>${m.length?`<div class="imeta">${m.join('')}</div>`:''}</div>
   ${i.price!=null?`<span class="ipr">${brl.format(i.price*(i.qty||1))}</span>`:''}<button class="grip" aria-label="Reordenar ${esc(i.name)}: arraste ou use as setas para cima e para baixo">${GRIP}</button></div></div>`;
 }
+function delMarked(l){
+  const n=(l.items||[]).filter(i=>i.done).length;if(!n)return;
+  openSheet(hd('Excluir marcados?')+`<p class="msg">${n===1?'1 item marcado será excluído':n+' itens marcados serão excluídos'} de “${esc(l.name)}”.</p>
+  <div class="sbtns"><button type="button" class="btn" data-close>Cancelar</button><button class="btn danger">Excluir ${n===1?'item':n+' itens'}</button></div>`,()=>{
+    const before=(l.items||[]).slice();l.items=before.filter(i=>!i.done);persist(l);closeSheet();renderDetail();render();
+    toast(n===1?'Item excluído':n+' itens excluídos',()=>{const L=byId(l.id);if(!L)return;const keep=new Set((L.items||[]).map(i=>i.id));L.items=before.filter(i=>i.done||keep.has(i.id)).concat((L.items||[]).filter(i=>!before.some(b=>b.id===i.id)));persist(L);renderDetail();render()});
+  });
+}
 function renderDetail(){
   if(g&&g.k!=='tap'){g.stale=true;return}
   const l=byId(openId);if(!l)return;const old=snapRows();const s=stats(l),it=l.items||[];
   det.style.setProperty('--c',okC(l.color));
   {const pb=$('#dPin'),on=pinnedList()===l;pb.classList.toggle('on',on);pb.setAttribute('aria-label',on?'Desafixar lista':'Fixar no topo')}
-  $('#dTags').innerHTML=(l.tag?`<span class="tag">${esc(l.tag)}</span>`:'')+`<span class="tag">${s.n} ${s.n===1?'item':'itens'}</span>`;
+  $('#dTags').innerHTML=`<span class="tag">${s.n} ${s.n===1?'item':'itens'}</span>`;
   $('#dTitle').textContent=l.name;
   $('#dSub').textContent=s.n?`${s.done} de ${s.n} marcados`:'Nenhum item ainda';
   $('#dTot').textContent=s.priced?(s.cart?`${brl.format(s.cart)} de ${brl.format(s.total)}`:`Total ${brl.format(s.total)}`):'';
-  $('#dBar').style.width=(s.n?s.done/s.n*100:0)+'%';
+  $('#dRing').innerHTML=s.n?ring(s.done,s.n):'';
   const pend=it.filter(i=>!i.done),done=it.filter(i=>i.done);
   $('#items').innerHTML=!it.length?`<div class="dempty"><p>Adicione o nome do produto. Quantidade, preço, link e observação são opcionais.</p><button class="solid" style="padding:0 22px" data-first>Adicionar o primeiro item</button></div>`
-    :`<div class="items">${pend.map(row).join('')}</div>${done.length?`<div class="sec"><span>Marcados (${done.length})</span><button data-reset>Desmarcar todos</button></div><div class="items">${done.map(row).join('')}</div>`:''}${hint&&it.length>1?'<p class="hint">Arraste pelos pontinhos para reordenar. Deslize para a esquerda para excluir.</p>':''}`;
+    :`<div class="items">${pend.map(row).join('')}</div>${done.length?`<div class="sec"><span>Marcados (${done.length})</span><div class="secb"><button data-reset>Desmarcar todos</button><button type="button" class="secdel" data-delmarked aria-label="Excluir itens marcados">${BIN}</button></div></div><div class="items">${done.map(row).join('')}</div>`:''}${hint&&it.length>1?'<p class="hint">Arraste pelos pontinhos para reordenar. Deslize para a esquerda para excluir.</p>':''}`;
   flip(old);
 }
 $('#items').addEventListener('click',e=>{
@@ -592,6 +609,7 @@ $('#items').addEventListener('click',e=>{
   const l=byId(openId);if(!l)return;
   if(e.target.closest('[data-first]'))return itemSheet();
   if(e.target.closest('[data-reset]')){l.items.forEach(i=>i.done=false);persist(l);renderDetail();render();return}
+  if(e.target.closest('[data-delmarked]'))return delMarked(l);
   const r=e.target.closest('.irow');if(!r)return;const it=l.items.find(i=>i.id===r.dataset.i);if(!it)return;
   if(e.target.closest('[data-chk]')){it.done=!it.done;persist(l);renderDetail();render();const c=document.querySelector(`.irow[data-i="${CSS.escape(it.id)}"] .chk svg`);if(c&&!RM)c.animate([{transform:'scale(.5)'},{transform:'scale(1.14)',offset:.6},{transform:'scale(1)'}],{duration:460,easing:'ease-out'})}
   else if(e.target.closest('[data-edit]'))itemSheet(it.id);
@@ -665,7 +683,7 @@ sh.addEventListener('click',e=>{
   if(e.target.closest('[data-join]'))return joinCode($('#join').value);
   if(e.target.closest('[data-fin]')){setTab(tab==='ok'?'ativas':'ok');return closeSheet()}
   const st=e.target.closest('[data-step]');if(st){const inp=sh.elements.qty;inp.value=fmtQ(Math.max(1,Math.round((parseNum(inp.value)||1)+ +st.dataset.step)));return}
-  const t=e.target.closest('[data-tag]');if(t){sh.elements.tag.value=t.dataset.tag;return}
+  const t=e.target.closest('[data-tag]');if(t){sh.elements.name.value=t.dataset.tag;miniUp();sh.elements.name.focus();return}
 });
 addEventListener('keydown',e=>{if(e.key!=='Escape')return;if(sh.classList.contains('on'))closeSheet();else if(openId)closeDetail()});
 const hd=t=>`<div class="shd"><h3>${t}</h3><button type="button" class="x" data-close aria-label="Fechar">${X}</button></div>`;
@@ -698,8 +716,8 @@ function listSheet(id){
   openSheet(hd(l?'Editar lista':'Nova lista')+`
   <div class="mini" id="mini" style="--c:${cur}"><span class="mono" id="miniL">${esc(l?l.name.charAt(0).toUpperCase():'?')}</span><b id="miniN">${esc(l?l.name:'Nome da lista')}</b></div>
   <label class="f"><span>Nome</span><input name="name" data-focus value="${esc(l&&l.name)}" placeholder="Ex.: Mercado do mês"></label>
-  <label class="f"><span>Categoria (opcional)</span><input name="tag" value="${esc(l&&l.tag)}" placeholder="Ex.: Mercado"></label>
-  <div class="chips">${TAGS.map(t=>`<button type="button" data-tag="${t}">${t}</button>`).join('')}</div>
+  <input type="hidden" name="tag" value="">
+  <div class="chips" aria-label="Sugestões de nome">${TAGS.map(t=>`<button type="button" data-tag="${t}">${t}</button>`).join('')}</div>
   <div class="f" style="margin-top:16px"><span>Cor</span><div class="sw">${COLORS.map(([n,c])=>`<label title="${n}"><input type="radio" name="color" value="${c}" aria-label="${n}"${c===cur?' checked':''}><span style="--s:${c}"></span></label>`).join('')}</div></div>
   <div class="sbtns">${l?'<button type="button" class="btn del" data-dellist>Excluir</button>':''}<button class="btn pri">${l?'Salvar':'Criar lista'}</button></div>`,()=>{
     const f=sh.elements,name=f.name.value.trim();
