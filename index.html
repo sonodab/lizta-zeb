@@ -56,7 +56,7 @@ input{font:inherit;font-size:16px;color:var(--ink);width:100%;background:var(--f
 input::placeholder{color:var(--mute)}
 /* cartões */
 /* superfícies coloridas: no claro a cor da lista é o fundo; no escuro vira um tom profundo com a cor nos destaques */
-.card,#detail,.mini{--cb:light-dark(var(--c),color-mix(in srgb,var(--c) 26%,#121315));--con:light-dark(#111214,var(--c));--cont:light-dark(#fff,#111214);--conm:light-dark(var(--c),#111214);--cw:light-dark(rgba(255,255,255,.55),rgba(255,255,255,.1));--cw2:light-dark(rgba(255,255,255,.62),rgba(255,255,255,.085));--cw3:light-dark(rgba(255,255,255,.28),rgba(255,255,255,.035));--cl:light-dark(rgba(17,18,20,.1),rgba(255,255,255,.13))}
+.card,#detail,.mini,.pin{--cb:light-dark(var(--c),color-mix(in srgb,var(--c) 26%,#121315));--con:light-dark(#111214,var(--c));--cont:light-dark(#fff,#111214);--conm:light-dark(var(--c),#111214);--cw:light-dark(rgba(255,255,255,.55),rgba(255,255,255,.1));--cw2:light-dark(rgba(255,255,255,.62),rgba(255,255,255,.085));--cw3:light-dark(rgba(255,255,255,.28),rgba(255,255,255,.035));--cl:light-dark(rgba(17,18,20,.1),rgba(255,255,255,.13))}
 .card{--c:#a6e6b8;background:var(--cb);color:var(--cink);border-radius:26px;padding:16px 16px 14px;margin-bottom:12px;cursor:pointer;transition:transform .35s cubic-bezier(.32,.72,0,1)}
 .card:active{transform:scale(.975)}
 .ctop{display:flex;gap:6px;align-items:center}
@@ -189,6 +189,19 @@ input::placeholder{color:var(--mute)}
 .seg span{transition:background-color .3s ease,box-shadow .3s ease;display:block;text-align:center;font-size:14px;line-height:40px;border-radius:11px;white-space:nowrap}
 .seg input:checked+span{background:var(--sheet);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.12)}
 .seg input:focus-visible+span{outline:2px solid #3a7bff;outline-offset:1px}
+/* lista fixada */
+.pin{--c:#a6e6b8;background:var(--cb);color:var(--cink);border-radius:28px;padding:16px 16px 14px;margin-bottom:14px;display:flex;flex-direction:column}
+.pin .pbtn{margin-left:auto;flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--con);color:var(--cont)}.pin .pbtn svg{width:18px;height:18px}
+.ptitle{display:block;text-align:left;width:100%;margin:12px 0 10px;padding:0}.ptitle h2{margin:0 0 2px;font-size:clamp(24px,6vw,30px);letter-spacing:-.03em;font-weight:600;line-height:1.1;overflow-wrap:anywhere}.ptitle span{font-size:13.5px;opacity:.7}
+.pin .pbar{flex:none}
+.pitems{max-height:50vh;overflow-y:auto;overscroll-behavior:contain;margin:12px -4px 0;padding:0 4px 2px;display:flex;flex-direction:column;gap:6px}
+.pitem{width:100%;text-align:left;cursor:pointer}
+.psec{font-size:12.5px;opacity:.6;margin:8px 4px 2px}.pempty{opacity:.7;margin:10px 4px}
+.pin .cacts{display:grid!important;margin-top:12px}
+#cards.haspin .rest .cmid,#cards.haspin .rest .cacts{display:none}#cards.haspin .rest .card{padding:12px 14px 10px}#cards.haspin .rest .cttl{margin:10px 0 8px}#cards.haspin .rest .cttl h2{font-size:17px}#cards.haspin .rest .card .mono{width:32px;height:32px;font-size:15px}#cards.haspin .rest .cmeta{margin:8px 0 2px}
+.rhint{color:var(--mute)}
+.rb.on{background:var(--con);color:var(--cont)}
+@media(min-width:960px){#cards.haspin{grid-template-columns:minmax(360px,42%) minmax(0,1fr);gap:22px}#cards.haspin .rest{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;align-content:start}#cards.haspin .rest .card{margin:0}.pin{position:sticky;top:20px;height:calc(100dvh - 270px);min-height:380px;margin:0}.pin .pitems{max-height:none;flex:1;min-height:0}}
 #scrim.clear{background:transparent}
 .sheet.top{top:calc(8px + var(--st));bottom:auto;left:8px;right:8px;max-width:520px;border-radius:22px;padding:8px 12px 12px;transform:translateY(calc(-100% - 40px));box-shadow:0 18px 50px rgba(0,0,0,.22);max-height:calc(100dvh - 24px)}
 .sheet.top.on{transform:none}
@@ -283,7 +296,7 @@ input::placeholder{color:var(--mute)}
   <div class="dwrap">
     <div class="dbar">
       <button class="rb" id="dBack" aria-label="Voltar"><svg class="i" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
-      <div class="dr"><button class="rb" id="dView" aria-label="Visualização"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg></button>
+      <div class="dr"><button class="rb" id="dPin" aria-label="Fixar no topo"><svg class="i" viewBox="0 0 24 24"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"/><path d="M12 15v6"/></svg></button><button class="rb" id="dView" aria-label="Visualização"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></svg></button>
       <button class="rb" id="dMore" aria-label="Editar lista"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg></button></div>
     </div>
     <div class="dtags" id="dTags"></div>
@@ -341,7 +354,7 @@ const LK='lizta-lists',KK='lizta-key',PK='lizta-pending';
 let key='',pend={},syncing=false,online=false,timer=0;
 function loadLocal(){try{lists=JSON.parse(localStorage.getItem(LK)||localStorage.getItem('app-listas')||'[]')}catch(e){lists=[]}try{pend=JSON.parse(localStorage.getItem(PK)||'{}')}catch(e){pend={}}}
 function saveLocal(){try{localStorage.setItem(LK,JSON.stringify(lists));localStorage.setItem(PK,JSON.stringify(pend))}catch(e){}}
-const clean=l=>JSON.parse(JSON.stringify({id:l.id,name:l.name,color:l.color,tag:l.tag||'',created:l.created,updated:l.updated,items:l.items||[]}));
+const clean=l=>JSON.parse(JSON.stringify({id:l.id,name:l.name,color:l.color,tag:l.tag||'',created:l.created,updated:l.updated,pin:l.pin||0,items:l.items||[]}));
 function newKey(){const a=new Uint8Array(18);crypto.getRandomValues(a);return btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_')}
 const okKey=k=>/^[A-Za-z0-9_-]{20,64}$/.test(k||'');
 function setKey(k){key=k;try{localStorage.setItem(KK,k)}catch(e){}}
@@ -407,6 +420,21 @@ function card(l){
   <div class="cacts"><button class="soft" data-add>Adicionar item</button><button class="solid">Abrir</button></div></article>`;
 }
 const finished=l=>{const s=stats(l);return s.n>0&&s.done===s.n};
+const PIN='<svg class="i" viewBox="0 0 24 24"><path d="M9 4h6l-1 6 4 3v2H6v-2l4-3z"/><path d="M12 15v6"/></svg>';
+function pinnedList(){let b=null;for(const l of lists)if((l.pin||0)>0&&(!b||l.pin>b.pin))b=l;return b}
+function setPin(id,on){const l=byId(id);if(!l)return;
+  if(on){for(const o of lists)if(o.id!==id&&(o.pin||0)>0){o.pin=0;persist(o)}l.pin=Date.now()}else l.pin=0;
+  persist(l);render();if(openId)renderDetail();toast(on?'Lista fixada no topo':'Lista desafixada')}
+function pinPanel(l){
+  const s=stats(l),it=l.items||[],pend=it.filter(i=>!i.done),done=it.filter(i=>i.done);
+  const prow=i=>`<button type="button" class="item pitem${i.done?' done':''}" data-pi="${esc(i.id)}"><span class="chk" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></span><span class="ib"><span class="iname"><b>${esc(i.name)}</b><span class="qty">×${fmtQ(i.qty)}</span></span>${i.note?`<span class="imeta"><span class="inote">${esc(i.note)}</span></span>`:''}</span>${i.price!=null?`<span class="ipr">${brl.format(i.price*(i.qty||1))}</span>`:''}</button>`;
+  return `<section class="pin" data-id="${esc(l.id)}" style="--c:${okC(l.color)}" aria-label="Lista fixada: ${esc(l.name)}">
+  <div class="ctop">${l.tag?`<span class="tag">${esc(l.tag)}</span>`:''}<span class="tag">Fixada</span><button type="button" class="pbtn" data-unpin aria-label="Desafixar lista">${PIN}</button></div>
+  <button type="button" class="ptitle" data-popen><h2>${esc(l.name)}</h2><span>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}${s.priced?` · ${brl.format(s.total)}`:''}</span></button>
+  <div class="pbar"><i style="width:${s.n?s.done/s.n*100:0}%"></i></div>
+  <div class="pitems">${it.length?pend.map(prow).join('')+(done.length?`<div class="psec">Marcados (${done.length})</div>`+done.map(prow).join(''):''):'<p class="pempty">Nenhum item ainda.</p>'}</div>
+  <div class="cacts"><button type="button" class="soft" data-padd>Adicionar item</button><button type="button" class="solid" data-popen>Abrir</button></div></section>`;
+}
 function render(){
   const act=lists.filter(l=>!finished(l)),fin=lists.filter(finished);
   $('#cA').textContent=act.length;$('#cF').textContent=fin.length;
@@ -414,17 +442,29 @@ function render(){
   let show=tab==='ativas'?act:fin;
   if(query)show=lists.filter(l=>(l.name+' '+(l.tag||'')+' '+(l.items||[]).map(i=>i.name+' '+(i.note||'')).join(' ')).toLowerCase().includes(query));
   show=show.slice().sort((a,b)=>(b.created||0)-(a.created||0));
+  const pinned=tab==='ativas'&&!query?pinnedList():null;
+  if(pinned)show=show.filter(l=>l.id!==pinned.id);
   let html=show.map(card).join('');
-  if(!show.length){
+  if(pinned)html=pinPanel(pinned)+`<div class="rest">${html||'<p class="pempty rhint">Suas outras listas aparecem aqui.</p>'}</div>`;
+  else if(!show.length){
     if(query)html=`<div class="empty"><h3>Nada encontrado</h3><p>Nenhuma lista ou item com “${esc(query)}”.</p></div>`;
     else if(tab==='ok')html=`<div class="empty"><h3>Nada concluído ainda</h3><p>Quando todos os itens de uma lista forem marcados, ela aparece aqui.</p></div>`;
     else html=`<div class="empty"><div class="pile" aria-hidden="true"><div class="a"></div><div class="b"></div><div class="c"></div></div><h3>${lists.length?'Tudo concluído':'Nenhuma lista ainda'}</h3><p>Crie uma lista para o mercado, compras online ou o que precisar.</p><button class="cta" data-new>Criar lista</button></div>`;
   }
-  $('#cards').innerHTML=html;
+  const pi=$('#cards .pitems'),pst=pi?pi.scrollTop:0;
+  $('#cards').classList.toggle('haspin',!!pinned);$('#cards').innerHTML=html;
+  const pi2=$('#cards .pitems');if(pi2&&pst)pi2.scrollTop=pst;
   if(firstPaint){firstPaint=false;if(!RM)document.querySelectorAll('#cards>*').forEach((c,i)=>c.animate([{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}],{duration:640,delay:i*70,easing:EZ,fill:'backwards'}))}
 }
 $('#cards').addEventListener('click',e=>{
   if(e.target.closest('[data-new]'))return listSheet();
+  const pn=e.target.closest('.pin');
+  if(pn){const l=byId(pn.dataset.id);if(!l)return;
+    if(e.target.closest('[data-unpin]'))return setPin(l.id,false);
+    const r=e.target.closest('[data-pi]');
+    if(r){const it=(l.items||[]).find(i=>i.id===r.dataset.pi);if(it){it.done=!it.done;persist(l);render()}return}
+    if(e.target.closest('[data-popen],[data-padd]'))openDetail(l.id,pn,!!e.target.closest('[data-padd]'));
+    return}
   const c=e.target.closest('.card');if(!c)return;
   openDetail(c.dataset.id,c,!!e.target.closest('[data-add]'));
 });
@@ -500,6 +540,7 @@ function renderDetail(){
   if(g&&g.k!=='tap'){g.stale=true;return}
   const l=byId(openId);if(!l)return;const old=snapRows();const s=stats(l),it=l.items||[];
   det.style.setProperty('--c',okC(l.color));
+  {const pb=$('#dPin'),on=pinnedList()===l;pb.classList.toggle('on',on);pb.setAttribute('aria-label',on?'Desafixar lista':'Fixar no topo')}
   $('#dTags').innerHTML=(l.tag?`<span class="tag">${esc(l.tag)}</span>`:'')+`<span class="tag">${s.n} ${s.n===1?'item':'itens'}</span>`;
   $('#dTitle').textContent=l.name;
   $('#dSub').textContent=s.n?`${s.done} de ${s.n} marcados`:'Nenhum item ainda';
@@ -527,6 +568,7 @@ $('#items').addEventListener('keydown',e=>{
   const nb=document.querySelector(`.irow[data-i="${CSS.escape(r.dataset.i)}"] .grip`);if(nb)nb.focus();
 });
 $('#dBack').addEventListener('click',closeDetail);
+$('#dPin').addEventListener('click',()=>{const l=byId(openId);if(l)setPin(l.id,pinnedList()!==l)});
 $('#bd').addEventListener('click',closeDetail);
 $('#dMore').addEventListener('click',()=>listSheet(openId));
 $('#dAdd').addEventListener('click',()=>itemSheet());
