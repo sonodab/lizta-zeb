@@ -223,6 +223,17 @@ input::placeholder{color:var(--mute)}
 .card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.cplace{opacity:.22}
 .cghost{position:fixed;z-index:40;pointer-events:none;margin:0!important;box-shadow:0 26px 60px rgba(0,0,0,.28);transform:scale(1.03) rotate(-1.2deg)}
 body.cdrag{-webkit-user-select:none;user-select:none;cursor:grabbing}
+@property --pr{syntax:'<number>';inherits:true;initial-value:0}
+.pin{will-change:transform;isolation:isolate}
+.pin::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;opacity:calc(var(--pr,0)*.9);
+  background:radial-gradient(circle at var(--fx,50%) var(--fy,50%),rgba(0,0,0,.16),rgba(0,0,0,.05) 28%,transparent 62%);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,calc(var(--pr,0)*.05)),inset 0 calc(var(--pr,0)*10px) calc(var(--pr,0)*28px) rgba(0,0,0,calc(var(--pr,0)*.10))}
+.rest{will-change:transform}
+.card:not(.pin){transition:transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .4s}
+.card.press:not(.pin){transform:perspective(900px) rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg)) scale(.965);transition:transform .16s cubic-bezier(.2,.8,.3,1)}
+.card.press:not(.pin)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at var(--fx,50%) var(--fy,50%),rgba(0,0,0,.12),transparent 60%)}
+.card{position:relative}
+.cghost{transition:transform .12s linear}
 .pin.pindrop{outline:3px dashed var(--ringc);outline-offset:4px}
 .pin::after{content:'Puxe para ver as outras listas';position:absolute;left:0;right:0;bottom:-30px;text-align:center;font-size:12.5px;color:var(--mute);opacity:0;transition:opacity .2s;pointer-events:none}
 .pin.pulling::after{opacity:1}.pin.pull::after{content:'Solte para ver as outras listas';color:var(--ink)}
@@ -644,22 +655,25 @@ const cardKey=l=>l.order!=null?l.order:-(l.created||0);
 function reorderLists(ids){ids.forEach((id,i)=>{const l=byId(id);if(l&&l.order!==i){l.order=i;persist(l)}})}
 function startCardDrag(){
   const s=cd;s.active=true;clearTimeout(s.t);const c=s.c,r=c.getBoundingClientRect();
-  const gh=c.cloneNode(true);gh.classList.add('cghost');Object.assign(gh.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
-  document.body.append(gh);s.gh=gh;s.ox=s.x-r.left;s.oy=s.y-r.top;c.classList.add('cplace');document.body.classList.add('cdrag');
+  const gh=c.cloneNode(true);gh.classList.remove('press');gh.classList.add('cghost');Object.assign(gh.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
+  document.body.append(gh);s.gh=gh;if(!RM)gh.animate([{transform:'scale(.97)',boxShadow:'0 2px 6px rgba(0,0,0,.1)'},{transform:'scale(1.05) rotate(-1deg)'}],{duration:320,easing:'cubic-bezier(.34,1.56,.64,1)'});s.ox=s.x-r.left;s.oy=s.y-r.top;c.classList.add('cplace');document.body.classList.add('cdrag');
   if(navigator.vibrate)try{navigator.vibrate(12)}catch(e){}
   const tick=()=>{if(cd!==s||!s.active)return;const y=s.cy;let v=0;if(y<90)v=-Math.ceil((90-y)/6);else if(y>innerHeight-90)v=Math.ceil((y-innerHeight+90)/6);if(v){scrollBy(0,v);moveCardDrag(s.cx,s.cy)}s.raf=requestAnimationFrame(tick)};
   s.cx=s.x;s.cy=s.y;s.raf=requestAnimationFrame(tick);
 }
 function moveCardDrag(x,y){
-  const s=cd;s.cx=x;s.cy=y;s.gh.style.left=(x-s.ox)+'px';s.gh.style.top=(y-s.oy)+'px';
-  const el=document.elementFromPoint(x,y),pn=el&&el.closest('.pin'),pin=$('#cards .pin');
-  s.toPin=!!pn;if(pin)pin.classList.toggle('pindrop',s.toPin);if(s.toPin)return;
-  const t=el&&el.closest('.card');if(!t||t===s.c||t.parentElement!==s.c.parentElement)return;
-  const tr=t.getBoundingClientRect(),mr=s.c.getBoundingClientRect(),same=Math.abs(tr.top-mr.top)<8;
-  const before=same?x<tr.left+tr.width/2:y<tr.top+tr.height/2;
-  const ref=before?t:t.nextSibling;if(ref===s.c||ref===s.c.nextSibling&&!before)return;
+  const s=cd;const vx=x-(s.cx??x);s.cx=x;s.cy=y;s.gh.style.left=(x-s.ox)+'px';s.gh.style.top=(y-s.oy)+'px';
+  s.tilt=(s.tilt||0)*.7+clamp(vx*.9,-9,9)*.3;s.gh.style.transform=`scale(1.05) rotate(${s.tilt-1}deg)`;
+  const pin=$('#cards .pin'),pr=pin&&pin.getBoundingClientRect();
+  /* soltar na fixada só quando o dedo entra bem nela; a faixa de baixo dela vale como "primeira posição" */
+  s.toPin=!!(pr&&y>pr.top&&y<pr.bottom-56&&x>pr.left&&x<pr.right);if(pin)pin.classList.toggle('pindrop',s.toPin);if(s.toPin)return;
+  /* posição pela geometria: acima do primeiro = início, abaixo do último = fim */
+  const others=[...s.c.parentElement.querySelectorAll('.card')].filter(c=>c!==s.c);if(!others.length)return;
+  let ref=null;
+  for(const c of others){const r=c.getBoundingClientRect();if(y<r.top+r.height*.5&&(y<r.top||x<r.right)){ref=c;break}if(y<r.bottom&&x<r.left+r.width/2&&x>=r.left){ref=c;break}}
+  if(ref===s.c.nextElementSibling&&ref)return;if(!ref&&others[others.length-1].nextElementSibling===s.c)return;
   const sib=[...s.c.parentElement.querySelectorAll('.card')],old=new Map(sib.map(c=>[c,c.getBoundingClientRect()]));
-  s.c.parentElement.insertBefore(s.c,ref);
+  if(ref)ref.before(s.c);else others[others.length-1].after(s.c);
   if(!RM)sib.forEach(c=>{if(c===s.c)return;const o=old.get(c),n=c.getBoundingClientRect();if(Math.abs(o.top-n.top)>1||Math.abs(o.left-n.left)>1)c.animate([{transform:`translate(${o.left-n.left}px,${o.top-n.top}px)`},{transform:'none'}],{duration:260,easing:EZ})});
 }
 function endCardDrag(){
@@ -686,32 +700,88 @@ addEventListener('pointerup',e=>{if(!cd||e.pointerId!==cd.pid)return;clearTimeou
 addEventListener('pointercancel',e=>{if(!cd||e.pointerId!==cd.pid)return;clearTimeout(cd.t);if(cd.active)endCardDrag();cd=null});
 document.addEventListener('touchmove',e=>{if(cd&&cd.active)e.preventDefault()},{passive:false});
 
-/* lista fixada: puxar com elástico para ver as outras listas (celular) */
+/* lista fixada: pressão do dedo + puxar com elástico para ver as outras listas (celular) */
 let el=null;const MOB=matchMedia('(max-width:959px)');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+/* transformação "viva": afunda onde o dedo pressiona, inclina, achata e é empurrada */
+function pinT(s,k=1){
+  const off=s.off*k,pr=s.pr*k,a=Math.abs(off);
+  const rx=(.5-s.fy)*7*pr+(s.mode==='up'?-1:1)*Math.min(a/38,4),ry=(s.fx-.5)*7*pr;
+  const sc=1-.022*pr,sy=1-Math.min(a/1600,.07),sx=1+Math.min(a/3600,.03);
+  return `perspective(1100px) translate3d(0,${off}px,0) rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc*sx},${sc*sy})`;
+}
+function pinPaint(s){
+  s.p.style.transformOrigin=`${s.fx*100}% ${s.fy*100}%`;s.p.style.transform=pinT(s);
+  s.p.style.setProperty('--fx',s.fx*100+'%');s.p.style.setProperty('--fy',s.fy*100+'%');s.p.style.setProperty('--pr',s.pr);
+  if(s.rest)s.rest.style.transform=s.mode==='up'&&s.off?`translate3d(0,${s.off*1.3}px,0)`:'';
+}
+/* mola de verdade (massa-mola amortecida) para o retorno */
+function springFrames(fn,{k=230,c=15,v0=0}={}){
+  const out=[],dt=1/120;let x=1,v=v0,t=0;
+  while(t<1.6){const f=-k*(x)-c*v;v+=f*dt;x+=v*dt;t+=dt;out.push(x);if(t>.25&&Math.abs(x)<.0015&&Math.abs(v)<.02)break}
+  const n=out.length,step=Math.max(1,Math.floor(n/60)),kf=[{transform:fn(1)}];
+  for(let i=step;i<n;i+=step)kf.push({transform:fn(out[i])});kf.push({transform:fn(0)});
+  return {kf,ms:Math.round(n*dt*1000)};
+}
+function pinRelease(s,v0){
+  const p=s.p;cancelAnimationFrame(s.raf);const snap={...s};
+  p.style.transform='';p.style.setProperty('--pr',0);
+  if(RM)return;
+  const {kf,ms}=springFrames(k=>pinT(snap,k),{v0});p.animate(kf,{duration:ms,easing:'linear'});
+  if(s.rest&&s.off){const r=springFrames(k=>`translate3d(0,${snap.off*1.3*k}px,0)`,{v0});s.rest.style.transform='';s.rest.animate(r.kf,{duration:r.ms,easing:'linear'})}
+  p.animate([{'--pr':snap.pr},{'--pr':0}],{duration:260,easing:EZ});
+}
 $('#cards').addEventListener('touchstart',e=>{
   const p=e.target.closest('.pin');if(!p||!MOB.matches||e.touches.length>1)return;
-  const pi=p.querySelector('.pitems');el={p,pi,inList:!!(pi&&pi.contains(e.target)),y:e.touches[0].clientY,off:0,mode:null};
+  const t=e.touches[0],r=p.getBoundingClientRect(),pi=p.querySelector('.pitems');
+  const s=el={p,pi,rest:$('#cards .rest'),inList:!!(pi&&pi.contains(e.target)),y:t.clientY,y0:t.clientY,off:0,mode:null,
+    fx:clamp((t.clientX-r.left)/r.width,0,1),fy:clamp((t.clientY-r.top)/r.height,0,1),pr:0,prT:1,lt:performance.now(),ly:t.clientY,vy:0};
+  p.classList.add('pressing');
+  /* a pressão cresce suave enquanto o dedo está apoiado */
+  const loop=()=>{if(el!==s)return;s.pr+=(s.prT-s.pr)*.16;pinPaint(s);s.raf=requestAnimationFrame(loop)};s.raf=requestAnimationFrame(loop);
 },{passive:true});
 $('#cards').addEventListener('touchmove',e=>{
-  if(!el||cd&&cd.active)return;const y=e.touches[0].clientY,dy=y-el.y,pi=el.pi;
+  if(!el||cd&&cd.active)return;const t=e.touches[0],y=t.clientY,dy=y-el.y,pi=el.pi,now=performance.now();
+  el.vy=(y-el.ly)/Math.max(1,now-el.lt);el.ly=y;el.lt=now;
   if(!el.mode){
     if(!dy)return;
     const atBottom=!pi||pi.scrollTop+pi.clientHeight>=pi.scrollHeight-1,atTop=!pi||pi.scrollTop<=0,pageTop=scrollY<=2;
     el.mode=pageTop&&dy<0&&(!el.inList||atBottom)?'up':pageTop&&dy>0&&(!el.inList||atTop)?'down':'native';
-    el.y=y;if(el.mode==='native')return;
+    el.y=y;
+    /* rolando a lista por dentro: a pressão vira um leve afundar só */
+    if(el.mode==='native'){el.prT=.35;return}
   }
   if(el.mode==='native')return;
   e.preventDefault();
-  const d=y-el.y,r=el.mode==='up'?Math.min(0,d):Math.max(0,d),off=Math.sign(r)*Math.pow(Math.abs(r),.85)*.55;
-  el.off=off;el.p.style.transform=`translateY(${off}px)`;el.p.classList.toggle('pulling',off<-12);el.p.classList.toggle('pull',off<-70);
+  const r=el.p.getBoundingClientRect();el.fx=clamp((t.clientX-r.left)/r.width,0,1);
+  const d=y-el.y,q=el.mode==='up'?Math.min(0,d):Math.max(0,d);
+  /* fricção crescente: quanto mais puxa, mais resiste */
+  const off=Math.sign(q)*(1-Math.exp(-Math.abs(q)/300))*240;
+  el.off=off;el.prT=1+Math.min(Math.abs(off)/120,.8);
+  const was=el.p.classList.contains('pull'),now2=off<-36;
+  el.p.classList.toggle('pulling',off<-8);el.p.classList.toggle('pull',now2);
+  if(now2&&!was&&navigator.vibrate)try{navigator.vibrate(8)}catch(e){}
 },{passive:false});
 const elEnd=()=>{
-  if(!el)return;const s=el;el=null;if(s.mode!=='up'&&s.mode!=='down')return;
-  const p=s.p,off=s.off;p.classList.remove('pull','pulling');p.style.transform='';
-  if(s.mode==='up'&&off<-70){const rest=$('#cards .rest');if(!RM)p.animate([{transform:`translateY(${off}px)`},{transform:'none'}],{duration:420,easing:EZ});if(rest)scrollTo({top:rest.getBoundingClientRect().top+scrollY-14,behavior:RM?'auto':'smooth'})}
-  else if(off&&!RM)p.animate([{transform:`translateY(${off}px)`},{transform:'none'}],{duration:560,easing:'cubic-bezier(.34,1.56,.64,1)'});
+  if(!el)return;const s=el;el=null;s.p.classList.remove('pressing');
+  const p=s.p,off=s.off;p.classList.remove('pull','pulling');
+  if(s.mode==='up'&&(off<-36||off<-14&&s.vy<-.45)){
+    pinRelease(s,0);
+    if(s.rest)scrollTo({top:s.rest.getBoundingClientRect().top+scrollY-14,behavior:RM?'auto':'smooth'});
+  }else pinRelease(s,off?clamp(-s.vy*6,-8,8):0);
 };
 $('#cards').addEventListener('touchend',elEnd);$('#cards').addEventListener('touchcancel',elEnd);
+
+/* cards comuns: afundam sob o dedo ao tocar */
+$('#cards').addEventListener('pointerdown',e=>{
+  const c=e.target.closest('.card');if(!c||c.closest('.pin'))return;const r=c.getBoundingClientRect();
+  c.style.setProperty('--fx',((e.clientX-r.left)/r.width*100)+'%');c.style.setProperty('--fy',((e.clientY-r.top)/r.height*100)+'%');
+  c.style.setProperty('--tx',((.5-(e.clientY-r.top)/r.height)*6)+'deg');c.style.setProperty('--ty',(((e.clientX-r.left)/r.width-.5)*6)+'deg');
+  c.classList.add('press');
+  const up=()=>{c.classList.remove('press');removeEventListener('pointerup',up);removeEventListener('pointercancel',up);removeEventListener('pointermove',mv)};
+  const x0=e.clientX,y0=e.clientY,mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>10&&!(cd&&cd.active))up()};
+  addEventListener('pointerup',up);addEventListener('pointercancel',up);addEventListener('pointermove',mv);
+});
 
 /* adicionar itens por voz */
 let rec=null,recList=null,recAll='';
