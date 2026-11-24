@@ -221,7 +221,7 @@ input::placeholder{color:var(--mute)}
 /* lista fixada */
 .pin{--c:#a6e6b8;background:var(--cb);color:var(--cink);border-radius:28px;padding:16px 16px 14px;margin-bottom:14px;display:flex;flex-direction:column;position:relative}
 .card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.cplace{opacity:.22}
-.cghost{position:fixed;z-index:40;pointer-events:none;margin:0!important;box-shadow:0 26px 60px rgba(0,0,0,.28);transform:scale(1.03) rotate(-1.2deg)}
+.cghost{position:fixed;z-index:40;pointer-events:none;margin:0!important;box-shadow:0 26px 60px rgba(0,0,0,.28);transform:scale(1.04)}
 body.cdrag{-webkit-user-select:none;user-select:none;cursor:grabbing}
 @property --pr{syntax:'<number>';inherits:true;initial-value:0}
 .pin{will-change:transform;isolation:isolate}
@@ -230,7 +230,7 @@ body.cdrag{-webkit-user-select:none;user-select:none;cursor:grabbing}
   box-shadow:inset 0 0 0 1px rgba(0,0,0,calc(var(--pr,0)*.05)),inset 0 calc(var(--pr,0)*10px) calc(var(--pr,0)*28px) rgba(0,0,0,calc(var(--pr,0)*.10))}
 .rest{will-change:transform}
 .card:not(.pin){transition:transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .4s}
-.card.press:not(.pin){transform:perspective(900px) rotateX(var(--tx,0deg)) rotateY(var(--ty,0deg)) scale(.965);transition:transform .16s cubic-bezier(.2,.8,.3,1)}
+.card.press:not(.pin){transform:scale(.97);transition:transform .16s cubic-bezier(.2,.8,.3,1)}
 .card.press:not(.pin)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at var(--fx,50%) var(--fy,50%),rgba(0,0,0,.12),transparent 60%)}
 .card{position:relative}
 .cghost{transition:transform .12s linear}
@@ -656,14 +656,14 @@ function reorderLists(ids){ids.forEach((id,i)=>{const l=byId(id);if(l&&l.order!=
 function startCardDrag(){
   const s=cd;s.active=true;clearTimeout(s.t);const c=s.c,r=c.getBoundingClientRect();
   const gh=c.cloneNode(true);gh.classList.remove('press');gh.classList.add('cghost');Object.assign(gh.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
-  document.body.append(gh);s.gh=gh;if(!RM)gh.animate([{transform:'scale(.97)',boxShadow:'0 2px 6px rgba(0,0,0,.1)'},{transform:'scale(1.05) rotate(-1deg)'}],{duration:320,easing:'cubic-bezier(.34,1.56,.64,1)'});s.ox=s.x-r.left;s.oy=s.y-r.top;c.classList.add('cplace');document.body.classList.add('cdrag');
+  document.body.append(gh);s.gh=gh;if(!RM)gh.animate([{transform:'scale(.97)',boxShadow:'0 2px 6px rgba(0,0,0,.1)'},{transform:'scale(1.04)'}],{duration:320,easing:'cubic-bezier(.34,1.56,.64,1)'});s.ox=s.x-r.left;s.oy=s.y-r.top;c.classList.add('cplace');document.body.classList.add('cdrag');
   if(navigator.vibrate)try{navigator.vibrate(12)}catch(e){}
   const tick=()=>{if(cd!==s||!s.active)return;const y=s.cy;let v=0;if(y<90)v=-Math.ceil((90-y)/6);else if(y>innerHeight-90)v=Math.ceil((y-innerHeight+90)/6);if(v){scrollBy(0,v);moveCardDrag(s.cx,s.cy)}s.raf=requestAnimationFrame(tick)};
   s.cx=s.x;s.cy=s.y;s.raf=requestAnimationFrame(tick);
 }
 function moveCardDrag(x,y){
   const s=cd;const vx=x-(s.cx??x);s.cx=x;s.cy=y;s.gh.style.left=(x-s.ox)+'px';s.gh.style.top=(y-s.oy)+'px';
-  s.tilt=(s.tilt||0)*.7+clamp(vx*.9,-9,9)*.3;s.gh.style.transform=`scale(1.05) rotate(${s.tilt-1}deg)`;
+  s.gh.style.transform='scale(1.04)';
   const pin=$('#cards .pin'),pr=pin&&pin.getBoundingClientRect();
   /* soltar na fixada só quando o dedo entra bem nela; a faixa de baixo dela vale como "primeira posição" */
   s.toPin=!!(pr&&y>pr.top&&y<pr.bottom-56&&x>pr.left&&x<pr.right);if(pin)pin.classList.toggle('pindrop',s.toPin);if(s.toPin)return;
@@ -706,12 +706,12 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 /* transformação "viva": afunda onde o dedo pressiona, inclina, achata e é empurrada */
 function pinT(s,k=1){
   const off=s.off*k,pr=s.pr*k,a=Math.abs(off);
-  const rx=(.5-s.fy)*7*pr+(s.mode==='up'?-1:1)*Math.min(a/38,4),ry=(s.fx-.5)*7*pr;
-  const sc=1-.022*pr,sy=1-Math.min(a/1600,.07),sx=1+Math.min(a/3600,.03);
-  return `perspective(1100px) translate3d(0,${off}px,0) rotateX(${rx}deg) rotateY(${ry}deg) scale(${sc*sx},${sc*sy})`;
+  /* sem inclinar: afunda por igual e estica como borracha, sempre reto */
+  const sc=1-.018*pr,sy=1+Math.min(a/700,.16),sx=1-Math.min(a/2600,.05);
+  return `translate3d(0,${off*.8}px,0) scale(${sc*sx},${sc*sy})`;
 }
 function pinPaint(s){
-  s.p.style.transformOrigin=`${s.fx*100}% ${s.fy*100}%`;s.p.style.transform=pinT(s);
+  s.p.style.transformOrigin=`50% ${s.fy*100}%`;s.p.style.transform=pinT(s);
   s.p.style.setProperty('--fx',s.fx*100+'%');s.p.style.setProperty('--fy',s.fy*100+'%');s.p.style.setProperty('--pr',s.pr);
   if(s.rest)s.rest.style.transform=s.mode==='up'&&s.off?`translate3d(0,${s.off*1.3}px,0)`:'';
 }
@@ -756,7 +756,7 @@ $('#cards').addEventListener('touchmove',e=>{
   const r=el.p.getBoundingClientRect();el.fx=clamp((t.clientX-r.left)/r.width,0,1);
   const d=y-el.y,q=el.mode==='up'?Math.min(0,d):Math.max(0,d);
   /* fricção crescente: quanto mais puxa, mais resiste */
-  const off=Math.sign(q)*(1-Math.exp(-Math.abs(q)/300))*240;
+  const off=Math.sign(q)*(1-Math.exp(-Math.abs(q)/420))*320;
   el.off=off;el.prT=1+Math.min(Math.abs(off)/120,.8);
   const was=el.p.classList.contains('pull'),now2=off<-36;
   el.p.classList.toggle('pulling',off<-8);el.p.classList.toggle('pull',now2);
@@ -928,9 +928,10 @@ $('#items').addEventListener('pointerdown',e=>{
 });
 function dragLay(){
   const s=g,me=s.rc[s.i],h=me.height+s.gap;
-  const dy=Math.max(s.rc[0].top-me.top,Math.min(s.rc[s.rc.length-1].bottom-me.bottom,s.cy-s.y+det.scrollTop-s.sc)),mid=me.top+me.height/2+dy;
+  /* o alvo usa a posição real do dedo (sem trava), então dá para chegar na primeira e na última posição */
+  const raw=s.cy-s.y+det.scrollTop-s.sc,dy=Math.max(s.rc[0].top-me.top,Math.min(s.rc[s.rc.length-1].bottom-me.bottom,raw)),mid=me.top+me.height/2+raw;
   let to=s.i;
-  s.rows.forEach((r,j)=>{if(j===s.i)return;const m=s.rc[j].top+s.rc[j].height/2;let t=0;if(j<s.i&&mid<m){t=h;to--}else if(j>s.i&&mid>m){t=-h;to++}r.style.transform=t?`translateY(${t}px)`:''});
+  s.rows.forEach((r,j)=>{if(j===s.i)return;const m=s.rc[j].top+s.rc[j].height/2;let t=0;if(j<s.i&&mid<=m){t=h;to--}else if(j>s.i&&mid>=m){t=-h;to++}r.style.transform=t?`translateY(${t}px)`:''});
   s.to=to;s.row.style.transform=`translateY(${dy}px)`;
 }
 function dragTick(){
