@@ -223,21 +223,26 @@ input::placeholder{color:var(--mute)}
 .card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.cplace{opacity:.22}
 .cghost{position:fixed;z-index:40;pointer-events:none;margin:0!important;box-shadow:0 26px 60px rgba(0,0,0,.28);transform:scale(1.04)}
 body.cdrag{-webkit-user-select:none;user-select:none;cursor:grabbing}
-@property --pr{syntax:'<number>';inherits:true;initial-value:0}
-.pin{will-change:transform;isolation:isolate}
-.pin::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;opacity:calc(var(--pr,0)*.9);
-  background:radial-gradient(circle at var(--fx,50%) var(--fy,50%),rgba(0,0,0,.16),rgba(0,0,0,.05) 28%,transparent 62%);
-  box-shadow:inset 0 0 0 1px rgba(0,0,0,calc(var(--pr,0)*.05)),inset 0 calc(var(--pr,0)*10px) calc(var(--pr,0)*28px) rgba(0,0,0,calc(var(--pr,0)*.10))}
-.rest{will-change:transform}
 .card:not(.pin){transition:transform .5s cubic-bezier(.34,1.56,.64,1),box-shadow .4s}
 .card.press:not(.pin){transform:scale(.97);transition:transform .16s cubic-bezier(.2,.8,.3,1)}
 .card.press:not(.pin)::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at var(--fx,50%) var(--fy,50%),rgba(0,0,0,.12),transparent 60%)}
 .card{position:relative}
 .cghost{transition:transform .12s linear}
 .pin.pindrop{outline:3px dashed var(--ringc);outline-offset:4px}
-.pin::after{content:'Puxe para ver as outras listas';position:absolute;left:0;right:0;bottom:-30px;text-align:center;font-size:12.5px;color:var(--mute);opacity:0;transition:opacity .2s;pointer-events:none}
-.pin.pulling::after{opacity:1}.pin.pull::after{content:'Solte para ver as outras listas';color:var(--ink)}
-@media(max-width:959px){.pin{height:calc(100vh - 92px - var(--st));height:calc(100svh - 92px - var(--st));min-height:420px;margin-bottom:22px}.pin .pitems{max-height:none;flex:1;min-height:0}}
+.deck{position:relative;height:calc(var(--H,600px) + 58px + (var(--n) - 1) * var(--S,500px))}
+.dstage{position:sticky;top:var(--dtop,90px);height:calc(var(--H,600px) + 58px)}
+.deck .pin{position:absolute;left:0;right:0;top:0;height:var(--H,600px);margin:0;transform-origin:50% 0;will-change:transform,opacity;box-shadow:0 -1px 0 rgba(255,255,255,.25) inset,0 10px 30px rgba(0,0,0,.08)}
+.deck .pin::after{content:'';position:absolute;inset:0;border-radius:inherit;background:#000;opacity:var(--dim,0);pointer-events:none;transition:opacity .2s}
+.deck .pin:not(.front){cursor:pointer}.deck .pin:not(.front) *{pointer-events:none}
+.deck .pin .pitems{max-height:none;flex:1;min-height:0;overscroll-behavior-y:auto}
+.dsnap{position:absolute;left:0;width:1px;height:1px;scroll-snap-align:start;scroll-margin-top:var(--dtop,90px);pointer-events:none}
+html.deckmode{scroll-snap-type:y mandatory}
+html.deckmode body::before{content:'';position:fixed;left:0;right:0;top:0;height:calc(var(--dtopg,90px) - 6px);background:var(--bg);z-index:30;pointer-events:none}
+html.deckmode .wrap{padding-top:calc(var(--bt) + var(--bh) + 18px)}
+html.deckmode .wrap>.brand{position:fixed;top:var(--bt,20px);left:var(--bl,18px);z-index:31}
+html.deckmode .wrap>.tabs{position:fixed;z-index:31}
+html.deckmode .wrap>.search{position:relative;z-index:31}
+.pin .pbtn.off{background:var(--cw);color:var(--cink)}
 .pin .pbtn{margin-left:auto;flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--con);color:var(--cont)}.pin .pbtn svg{width:18px;height:18px}
 .ptitle{display:block;text-align:left;width:100%;margin:12px 0 10px;padding:0}.ptitle h2{margin:0 0 2px;font-size:clamp(24px,6vw,30px);letter-spacing:-.03em;font-weight:600;line-height:1.1;overflow-wrap:anywhere}.ptitle span{font-size:13.5px;opacity:.7}
 .pin .pbar{flex:none}
@@ -486,17 +491,43 @@ function pinnedList(){let b=null;for(const l of lists)if((l.pin||0)>0&&(!b||l.pi
 function setPin(id,on){const l=byId(id);if(!l)return;
   if(on){for(const o of lists)if(o.id!==id&&(o.pin||0)>0){o.pin=0;persist(o)}l.pin=Date.now()}else l.pin=0;
   persist(l);render();if(openId)renderDetail();toast(on?'Lista fixada no topo':'Lista desafixada')}
-function pinPanel(l){
+function pinPanel(l,deck){
+  const isPin=!deck||l.pin;
   const s=stats(l),it=l.items||[],pend=it.filter(i=>!i.done),done=it.filter(i=>i.done);
   const prow=i=>`<button type="button" class="item pitem${i.done?' done':''}" data-pi="${esc(i.id)}"><span class="chk" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></span><span class="ib"><span class="iname"><b>${esc(i.name)}</b><span class="qty">×${fmtQ(i.qty)}</span></span>${i.note?`<span class="imeta"><span class="inote">${esc(i.note)}</span></span>`:''}</span>${i.price!=null?`<span class="ipr">${brl.format(i.price*(i.qty||1))}</span>`:''}</button>`;
-  return `<section class="pin" data-id="${esc(l.id)}" style="--c:${okC(l.color)}" aria-label="Lista fixada: ${esc(l.name)}">
-  <div class="ctop"><span class="tag">Fixada</span><button type="button" class="pbtn" data-unpin aria-label="Desafixar lista">${PIN}</button></div>
-  <button type="button" class="ptitle" data-popen><span class="ptx"><h2>${esc(l.name)}</h2><span>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}${s.priced?` · ${brl.format(s.total)}`:''}</span></span>${s.n?ring(s.done,s.n):''}</button>
+  return `<section class="pin${isPin?' ispin':''}" data-id="${esc(l.id)}" style="--c:${okC(l.color)}" aria-label="${isPin?'Lista fixada: ':'Lista: '}${esc(l.name)}">
+  <div class="ctop">${isPin?'<span class="tag">Fixada</span>':`<span class="tag">${esc(l.tag||'Lista')}</span>`}<button type="button" class="pbtn${isPin?'':' off'}" ${isPin?'data-unpin aria-label="Desafixar lista"':'data-dopin aria-label="Fixar lista"'}>${PIN}</button></div>
+  <div class="ptitle"><span class="ptx"><h2>${esc(l.name)}</h2><span>${s.n?`${s.done} de ${s.n} marcados`:'Lista vazia'}${s.priced?` · ${brl.format(s.total)}`:''}</span></span>${s.n?ring(s.done,s.n):''}</div>
   <div class="pitems">${it.length?pend.map(prow).join('')+(done.length?`<button type="button" class="psec" data-popen>${pend.length?'':'Tudo marcado! '}${done.length} ${done.length===1?'marcado':'marcados'} · ver na lista</button>`:''):'<p class="pempty">Nenhum item ainda.</p>'}</div>
   <div class="cacts pacts">${SR?`<button type="button" class="soft pmic${rec&&recList===l.id?' rec':''}" data-pmic aria-label="Adicionar itens por voz">${MIC}</button>`:''}<button type="button" class="soft" data-padd>Adicionar item</button><button type="button" class="solid" data-popen>Abrir</button></div></section>`;
 }
 function setTab(t){tab=t;scrollTo({top:0});render()}
 function ring(d,n){const p=n?Math.round(d/n*100):0;return `<span class="ring" role="img" aria-label="${d} de ${n} marcados"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="rt" cx="18" cy="18" r="15.5"/>${p?`<circle class="rf" cx="18" cy="18" r="15.5" pathLength="100" stroke-dasharray="${p} 100"/>`:''}</svg><b>${d}<small>/${n}</small></b></span>`}
+/* baralho (celular): a lista da frente em destaque, as outras empilhadas atrás; rolar traz a de trás para a frente */
+function isMob(){return matchMedia('(max-width:959px)').matches}
+let dk={S:500,H:600,top:0};
+function deckSize(){
+  const d=$('#cards .deck');if(!d)return;const br=$('.wrap>.brand'),H=document.documentElement;
+  if(!H.style.getPropertyValue('--bt')){H.classList.remove('deckmode');const r=br.getBoundingClientRect();H.style.setProperty('--bt',r.top+scrollY+'px');H.style.setProperty('--bl',r.left+'px');H.style.setProperty('--bh',r.height+'px');H.classList.add('deckmode')}
+  const top=Math.max(0,d.getBoundingClientRect().top+scrollY),vh=innerHeight;
+  dk.top=top;dk.H=Math.max(380,vh-top-58);dk.S=Math.round(vh*.6);document.documentElement.style.setProperty('--dtopg',top+'px');
+  d.style.setProperty('--H',dk.H+'px');d.style.setProperty('--S',dk.S+'px');d.style.setProperty('--dtop',top+'px');
+  deckLay();
+}
+function deckLay(){
+  const d=$('#cards .deck');if(!d)return;const ps=[...d.querySelectorAll('.pin')],n=ps.length,H=dk.H,peek=H*.04+12;
+  const p=Math.max(0,Math.min(n-1,scrollY/dk.S));
+  ps.forEach((el,i)=>{const t=i-p;let y,sc,o=1,dim=0;
+    if(t<0){y=t*(H+40);sc=1+t*.06}
+    else{const k=Math.min(t,3);y=k*peek;sc=1-.045*k;dim=k*.09;if(t>3)o=Math.max(0,4-t)}
+    el.style.transform=`translate3d(0,${y.toFixed(1)}px,0) scale(${sc.toFixed(4)})`;el.style.opacity=o;el.style.zIndex=200-i;
+    el.style.setProperty('--dim',dim.toFixed(3));el.style.visibility=t<-1.05||t>4?'hidden':'';
+    const f=Math.abs(t)<.5;if(el.classList.contains('front')!==f){el.classList.toggle('front',f);el.inert=!f&&t<0}});
+}
+function deckGo(k){const sn=document.querySelectorAll('#cards .dsnap')[k];if(sn)scrollTo({top:k*dk.S,behavior:RM?'auto':'smooth'})}
+let dkRaf=0;addEventListener('scroll',()=>{if(dkRaf)return;dkRaf=requestAnimationFrame(()=>{dkRaf=0;deckLay()})},{passive:true});
+if(window.ResizeObserver)(o=>{o.observe($('#search'));o.observe($('#note'))})(new ResizeObserver(()=>{if(document.documentElement.classList.contains('deckmode'))deckSize()}));
+let dkMob=isMob();addEventListener('resize',()=>{const m=isMob();if(m!==dkMob){dkMob=m;render()}else deckSize()});
 function render(){
   const act=lists.filter(l=>!finished(l)),fin=lists.filter(finished);
   $('#cA').textContent=act.length;$('#cF').textContent=fin.length;
@@ -507,17 +538,19 @@ function render(){
   const pinned=tab==='ativas'&&!query?pinnedList():null;
   if(pinned)show=show.filter(l=>l.id!==pinned.id);
   let html=show.map(card).join('');
-  if(pinned)html=pinPanel(pinned)+`<div class="rest">${html||'<p class="pempty rhint">Suas outras listas aparecem aqui.</p>'}</div>`;
+  const deck=tab==='ativas'&&!query&&isMob()&&(pinned||show.length);
+  if(deck){const all=(pinned?[pinned]:[]).concat(show);html=`<div class="deck" style="--n:${all.length}"><div class="dstage">${all.map((l,k)=>pinPanel(l,true).replace('<section class="pin','<section data-k="'+k+'" class="pin')).join('')}</div>${all.map((_,k)=>`<i class="dsnap" style="top:calc(${k} * var(--S))"></i>`).join('')}</div>`}
+  else if(pinned)html=pinPanel(pinned)+`<div class="rest">${html||'<p class="pempty rhint">Suas outras listas aparecem aqui.</p>'}</div>`;
   else if(!show.length&&tab!=='ok'||query&&!show.length){
     if(query)html=`<div class="empty"><h3>Nada encontrado</h3><p>Nenhuma lista ou item com “${esc(query)}”.</p></div>`;
     else if(tab==='ok')html=`<div class="empty"><h3>Nada concluído ainda</h3><p>Quando todos os itens de uma lista forem marcados, ela aparece aqui.</p></div>`;
     else html=`<div class="empty"><div class="pile" aria-hidden="true"><div class="a"></div><div class="b"></div><div class="c"></div></div><h3>${lists.length?'Tudo concluído':'Nenhuma lista ainda'}</h3><p>Crie uma lista para o mercado, compras online ou o que precisar.</p><button class="cta" data-new>Criar lista</button></div>`;
   }
   if(tab==='ok'&&!query)html=`<div class="finbar"><b>Listas concluídas</b><button type="button" data-back>Voltar às listas</button></div>`+(html||'<div class="empty"><h3>Nada concluído ainda</h3><p>Quando todos os itens de uma lista forem marcados, ela aparece aqui.</p></div>');
-  const pi=$('#cards .pitems'),pst=pi?pi.scrollTop:0;
-  $('#cards').classList.toggle('haspin',!!pinned);$('#cards').innerHTML=html;
-  const pi2=$('#cards .pitems');if(pi2&&pst)pi2.scrollTop=pst;
-  if(firstPaint){firstPaint=false;if(!RM)document.querySelectorAll('#cards>*').forEach((c,i)=>c.animate([{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}],{duration:640,delay:i*70,easing:EZ,fill:'backwards'}))}
+  const pst=new Map([...document.querySelectorAll('#cards .pin')].map(x=>[x.dataset.id,x.querySelector('.pitems')?.scrollTop||0]));
+  $('#cards').classList.toggle('haspin',!!pinned&&!deck);$('#cards').innerHTML=html;document.documentElement.classList.toggle('deckmode',!!deck);if(deck)deckSize();
+  document.querySelectorAll('#cards .pin').forEach(x=>{const v=pst.get(x.dataset.id),q=x.querySelector('.pitems');if(v&&q)q.scrollTop=v});
+  if(firstPaint){firstPaint=false;if(!RM&&!deck)document.querySelectorAll('#cards>*').forEach((c,i)=>c.animate([{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}],{duration:640,delay:i*70,easing:EZ,fill:'backwards'}))}
 }
 $('#cards').addEventListener('click',e=>{
   if(Date.now()-cardNoClick<450)return;
@@ -525,7 +558,9 @@ $('#cards').addEventListener('click',e=>{
   if(e.target.closest('[data-back]'))return setTab('ativas');
   const pn=e.target.closest('.pin');
   if(pn){const l=byId(pn.dataset.id);if(!l)return;
+    if(pn.closest('.deck')&&!pn.classList.contains('front'))return deckGo(+pn.dataset.k);
     if(e.target.closest('[data-unpin]'))return setPin(l.id,false);
+    if(e.target.closest('[data-dopin]'))return setPin(l.id,true);
     if(e.target.closest('[data-pmic]'))return startVoice(l.id);
     const r=e.target.closest('[data-pi]');
     if(r){const it=(l.items||[]).find(i=>i.id===r.dataset.pi);if(it){it.done=!it.done;persist(l);render()}return}
@@ -700,77 +735,7 @@ addEventListener('pointerup',e=>{if(!cd||e.pointerId!==cd.pid)return;clearTimeou
 addEventListener('pointercancel',e=>{if(!cd||e.pointerId!==cd.pid)return;clearTimeout(cd.t);if(cd.active)endCardDrag();cd=null});
 document.addEventListener('touchmove',e=>{if(cd&&cd.active)e.preventDefault()},{passive:false});
 
-/* lista fixada: pressão do dedo + puxar com elástico para ver as outras listas (celular) */
-let el=null;const MOB=matchMedia('(max-width:959px)');
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-/* transformação "viva": afunda onde o dedo pressiona, inclina, achata e é empurrada */
-function pinT(s,k=1){
-  const off=s.off*k,pr=s.pr*k,a=Math.abs(off);
-  /* sem inclinar: afunda por igual e estica como borracha, sempre reto */
-  const sc=1-.018*pr,sy=1+Math.min(a/700,.16),sx=1-Math.min(a/2600,.05);
-  return `translate3d(0,${off*.8}px,0) scale(${sc*sx},${sc*sy})`;
-}
-function pinPaint(s){
-  s.p.style.transformOrigin=`50% ${s.fy*100}%`;s.p.style.transform=pinT(s);
-  s.p.style.setProperty('--fx',s.fx*100+'%');s.p.style.setProperty('--fy',s.fy*100+'%');s.p.style.setProperty('--pr',s.pr);
-  if(s.rest)s.rest.style.transform=s.mode==='up'&&s.off?`translate3d(0,${s.off*1.3}px,0)`:'';
-}
-/* mola de verdade (massa-mola amortecida) para o retorno */
-function springFrames(fn,{k=230,c=15,v0=0}={}){
-  const out=[],dt=1/120;let x=1,v=v0,t=0;
-  while(t<1.6){const f=-k*(x)-c*v;v+=f*dt;x+=v*dt;t+=dt;out.push(x);if(t>.25&&Math.abs(x)<.0015&&Math.abs(v)<.02)break}
-  const n=out.length,step=Math.max(1,Math.floor(n/60)),kf=[{transform:fn(1)}];
-  for(let i=step;i<n;i+=step)kf.push({transform:fn(out[i])});kf.push({transform:fn(0)});
-  return {kf,ms:Math.round(n*dt*1000)};
-}
-function pinRelease(s,v0){
-  const p=s.p;cancelAnimationFrame(s.raf);const snap={...s};
-  p.style.transform='';p.style.setProperty('--pr',0);
-  if(RM)return;
-  const {kf,ms}=springFrames(k=>pinT(snap,k),{v0});p.animate(kf,{duration:ms,easing:'linear'});
-  if(s.rest&&s.off){const r=springFrames(k=>`translate3d(0,${snap.off*1.3*k}px,0)`,{v0});s.rest.style.transform='';s.rest.animate(r.kf,{duration:r.ms,easing:'linear'})}
-  p.animate([{'--pr':snap.pr},{'--pr':0}],{duration:260,easing:EZ});
-}
-$('#cards').addEventListener('touchstart',e=>{
-  const p=e.target.closest('.pin');if(!p||!MOB.matches||e.touches.length>1)return;
-  const t=e.touches[0],r=p.getBoundingClientRect(),pi=p.querySelector('.pitems');
-  const s=el={p,pi,rest:$('#cards .rest'),inList:!!(pi&&pi.contains(e.target)),y:t.clientY,y0:t.clientY,off:0,mode:null,
-    fx:clamp((t.clientX-r.left)/r.width,0,1),fy:clamp((t.clientY-r.top)/r.height,0,1),pr:0,prT:1,lt:performance.now(),ly:t.clientY,vy:0};
-  p.classList.add('pressing');
-  /* a pressão cresce suave enquanto o dedo está apoiado */
-  const loop=()=>{if(el!==s)return;s.pr+=(s.prT-s.pr)*.16;pinPaint(s);s.raf=requestAnimationFrame(loop)};s.raf=requestAnimationFrame(loop);
-},{passive:true});
-$('#cards').addEventListener('touchmove',e=>{
-  if(!el||cd&&cd.active)return;const t=e.touches[0],y=t.clientY,dy=y-el.y,pi=el.pi,now=performance.now();
-  el.vy=(y-el.ly)/Math.max(1,now-el.lt);el.ly=y;el.lt=now;
-  if(!el.mode){
-    if(!dy)return;
-    const atBottom=!pi||pi.scrollTop+pi.clientHeight>=pi.scrollHeight-1,atTop=!pi||pi.scrollTop<=0,pageTop=scrollY<=2;
-    el.mode=pageTop&&dy<0&&(!el.inList||atBottom)?'up':pageTop&&dy>0&&(!el.inList||atTop)?'down':'native';
-    el.y=y;
-    /* rolando a lista por dentro: a pressão vira um leve afundar só */
-    if(el.mode==='native'){el.prT=.35;return}
-  }
-  if(el.mode==='native')return;
-  e.preventDefault();
-  const r=el.p.getBoundingClientRect();el.fx=clamp((t.clientX-r.left)/r.width,0,1);
-  const d=y-el.y,q=el.mode==='up'?Math.min(0,d):Math.max(0,d);
-  /* fricção crescente: quanto mais puxa, mais resiste */
-  const off=Math.sign(q)*(1-Math.exp(-Math.abs(q)/420))*320;
-  el.off=off;el.prT=1+Math.min(Math.abs(off)/120,.8);
-  const was=el.p.classList.contains('pull'),now2=off<-36;
-  el.p.classList.toggle('pulling',off<-8);el.p.classList.toggle('pull',now2);
-  if(now2&&!was&&navigator.vibrate)try{navigator.vibrate(8)}catch(e){}
-},{passive:false});
-const elEnd=()=>{
-  if(!el)return;const s=el;el=null;s.p.classList.remove('pressing');
-  const p=s.p,off=s.off;p.classList.remove('pull','pulling');
-  if(s.mode==='up'&&(off<-36||off<-14&&s.vy<-.45)){
-    pinRelease(s,0);
-    if(s.rest)scrollTo({top:s.rest.getBoundingClientRect().top+scrollY-14,behavior:RM?'auto':'smooth'});
-  }else pinRelease(s,off?clamp(-s.vy*6,-8,8):0);
-};
-$('#cards').addEventListener('touchend',elEnd);$('#cards').addEventListener('touchcancel',elEnd);
 
 /* cards comuns: afundam sob o dedo ao tocar */
 $('#cards').addEventListener('pointerdown',e=>{
