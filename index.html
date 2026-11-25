@@ -562,7 +562,8 @@ let dkRaf=0;addEventListener('scroll',()=>{if(dkRaf)return;dkRaf=requestAnimatio
 if(window.ResizeObserver)(o=>{o.observe($('#search'));o.observe($('#note'))})(new ResizeObserver(()=>{if(document.documentElement.classList.contains('deckmode'))deckSize()}));
 let dkMob=isMob();addEventListener('resize',()=>{const m=isMob();if(m!==dkMob){dkMob=m;render()}else deckSize()});
 function render(){
-  const act=lists.filter(l=>!finished(l)),fin=lists.filter(finished);
+  /* listas só saem da tela quando são excluídas: marcar tudo não esconde mais */
+  const act=lists,fin=[];if(tab==='ok')tab='ativas';
   $('#cA').textContent=act.length;$('#cF').textContent=fin.length;
   if(!loaded)return;
   let show=tab==='ativas'?act:fin;
@@ -990,7 +991,6 @@ function viewSheet(){
   <div class="vrow"><span>Interface</span>${seg('dens',view.d,[['c','Confortável'],['k','Compacta'],['m','Mínima']])}</div>
   <div class="vrow"><span>Textos</span>${seg('txt',view.t,[['f','Completos'],['s','Resumidos'],['e','Essencial']])}</div>
   <div class="vrow"><span>Tema</span>${seg('mode',view.m,[['a','Auto'],['l','Claro'],['d','Escuro']])}</div>
-  <button type="button" class="vfin" data-fin>${tab==='ok'?'Voltar às listas':`Listas concluídas <i>${lists.filter(finished).length}</i>`}</button>
   <details class="sync"><summary>Sincronizar com outro aparelho<small>${online?'Sincronizado':'Não sincronizado'}</small></summary>
   <div class="syncbox"><p>Abra este link no outro aparelho (ou cole lá o código) para ver as mesmas listas. Guarde-o: é a chave das suas listas.</p>
   <input id="mylink" readonly value="${esc(location.origin+'/?k='+key)}" aria-label="Seu link de acesso">
